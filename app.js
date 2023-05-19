@@ -1,8 +1,8 @@
 const express = require("express");
 const app = express();
 let bodyParser = require("body-parser");
-const loginRouter = require("./routes/dimo_login.js");
-const signupRouter = require("./routes/signup.js");
+const loginRouter = require("./routes/standard_login.js");
+const signupRouter = require("./routes/dimo_signup.js");
 // const googleLoginRouter = require("./routes/googleLogin.js");
 // const kakaoLoginRouter = require("./routes/kakaoLogin.js");
 
