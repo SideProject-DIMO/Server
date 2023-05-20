@@ -3,8 +3,8 @@ const app = express();
 let bodyParser = require("body-parser");
 const loginRouter = require("./routes/standard_login.js");
 const signupRouter = require("./routes/dimo_signup.js");
-// const googleLoginRouter = require("./routes/googleLogin.js");
-// const kakaoLoginRouter = require("./routes/kakaoLogin.js");
+const googleLoginRouter = require("./routes/google_login.js");
+const kakaoLoginRouter = require("./routes/kakao_login.js");
 
 const logoutRouter = require("./routes/logout");
 
@@ -19,8 +19,8 @@ app.get("/", async (req, res) => {
 
 app.use("/signup", signupRouter);
 
-// app.post("/kakaoLogin", kakaoLoginRouter);
-// app.post("/googleLogin", googleLoginRouter);
+app.post("/kakao_login", kakaoLoginRouter);
+app.post("/google_login", googleLoginRouter);
 
 app.post("/login", loginRouter);
 app.get("/logout", logoutRouter);
