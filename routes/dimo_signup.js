@@ -19,8 +19,8 @@ router.post("/", async (req, res, next) => {
     refresh_token,
   } = req.body;
   const password_bcrypt = bcrypt.hashSync(password, 10); // sync
-  var resultCode = 404;
-  var message = "에러가 발생했습니다.";
+  let resultCode = 404;
+  let message = "에러가 발생했습니다.";
   try {
     //문제 없으면 try문 실행
     const data = await pool.query(
