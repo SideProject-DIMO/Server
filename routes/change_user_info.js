@@ -65,9 +65,10 @@ router.get("/change_nickname", async (req, res, next) => {
   let user_id = req.body.user_id;
   let nickname = req.body.nickname;
   try {
+    let now = new Date();
     const [change_nickname] = await pool.execute(
-      `UPDATE user SET nickname = ? where user_id = ?`,
-      [nickname, user_id]
+      `UPDATE user SET nickname = ?, updated_at = ? where user_id = ?`,
+      [nickname, now, user_id]
     );
 
     resultCode = 200;
