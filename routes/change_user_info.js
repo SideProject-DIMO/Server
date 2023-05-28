@@ -9,17 +9,30 @@ router.get("/change_pw", async (req, res, next) => {
   let password = req.body.password;
   let passwordBy = bcrypt.hashSync(password, 10); // sync
   try {
+    const [is_pw_dup] = await pool.execute(
+      `SELECT password from user where user_id = ?`,
+      [user_id]
+    );
+
+    //select가 undefined 라면
+    if (is_pw_dup[0] == undefined) {
+      resultCode = 401;
+      message = "존재하지 않는 아이디입니다.";
+    } //비밀번호 복호화 시, 입력한 값과 동일할 경우
+    else if (await bcrypt.compare(password, is_pw_dup[0].password)) {
+      console.log(password);
+
+      resultCode = 401;
+      message = "같은 비밀번호가 입력되었습니다.";
+    } else {
+      resultCode = 200;
+      message = "비밀번호가 성공적으로 변경되었습니다.";
+    }
+
     const [change_pw] = await pool.execute(
       `UPDATE user SET password = ? where user_id = ?`,
       [passwordBy, user_id]
     );
-
-    if (change_pw[0] == undefined) {
-      message = "id_not_exist";
-    }
-
-    resultCode = 200;
-    message = "비밀번호가 성공적으로 변경되었습니다.";
 
     return res.json({
       code: resultCode,
