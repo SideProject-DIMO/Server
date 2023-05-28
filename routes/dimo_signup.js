@@ -139,6 +139,8 @@ router.post("/phone-check/verify", async (req, res) => {
     const expire_time = new Date(result[0].expire).setHours(
       new Date(result[0].expire).getHours() + 9
     );
+    console.log(result[0]);
+
     const now = Date.now();
 
     if (code === result[0].code && expire_time > now) {
@@ -156,27 +158,28 @@ router.post("/phone-check/verify", async (req, res) => {
   }
 });
 
+// 아이디 중복 확인
 router.get("/is_id_dup", async (req, res) => {
-  let id = req.query.id;
+  let user_id = req.body.user_id;
   try {
     const [is_id_dup] = await pool.execute(
-      `SELECT EXISTS (SELECT user_no FROM user WHERE user_id = ?) as no;`,
-      [id]
+      `SELECT user_id from user where user_id = ?`,
+      [user_id]
     );
 
-    if (is_id_dup[0].no) {
-      // dup이면 1
-      resultCode = 200;
-      message = "id_dup";
+    if (is_id_dup[0] != undefined) {
+      // user_id가 존재하면 중복되는 아이디 존재
+      resultCode = 401;
+      message = "사용할 수 없는 아이디입니다.";
     } else {
       resultCode = 200;
-      message = "id_not_dup";
+      message = "사용 가능한 아이디입니다.";
     }
 
     return res.json({
       code: resultCode,
       message: message,
-      id: id,
+      user_id: user_id,
     });
   } catch (err) {
     console.error(err);
