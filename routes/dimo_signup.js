@@ -160,7 +160,7 @@ router.post("/phone-check/verify", async (req, res) => {
 
 // 아이디 중복 확인
 router.get("/is_id_dup", async (req, res) => {
-  let user_id = req.body.user_id;
+  let user_id = req.query.user_id;
   try {
     const [is_id_dup] = await pool.execute(
       `SELECT user_id from user where user_id = ?`,
