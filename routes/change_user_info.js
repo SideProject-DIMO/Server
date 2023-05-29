@@ -5,8 +5,8 @@ const bcrypt = require("bcrypt");
 
 // 비밀번호 변경
 router.get("/change_pw", async (req, res, next) => {
-  let user_id = req.body.user_id;
-  let password = req.body.password;
+  let user_id = req.query.user_id;
+  let password = req.query.password;
   let passwordBy = bcrypt.hashSync(password, 10); // sync
   try {
     const [is_pw_dup] = await pool.execute(
@@ -47,8 +47,8 @@ router.get("/change_pw", async (req, res, next) => {
 
 // 닉네임 중복 확인
 router.get("/confirm_nickname", async (req, res, next) => {
-  let user_id = req.body.user_id;
-  let nickname = req.body.nickname;
+  let user_id = req.query.user_id;
+  let nickname = req.query.nickname;
   try {
     const [nickname_dp] = await pool.execute(
       `SELECT nickname FROM user WHERE nickname = ?`,
@@ -75,8 +75,8 @@ router.get("/confirm_nickname", async (req, res, next) => {
 
 // 닉네임 변경
 router.get("/change_nickname", async (req, res, next) => {
-  let user_id = req.body.user_id;
-  let nickname = req.body.nickname;
+  let user_id = req.query.user_id;
+  let nickname = req.query.nickname;
   try {
     let now = new Date();
     const [change_nickname] = await pool.execute(
