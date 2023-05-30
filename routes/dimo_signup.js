@@ -3,6 +3,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const axios = require("axios");
+const jwt = require("jsonwebtoken");
 const CryptoJS = require("crypto-js");
 
 //회원가입
@@ -16,10 +17,26 @@ router.post("/", async (req, res, next) => {
     phone_number,
     nickname,
     mbti,
-    refresh_token,
   } = req.body;
   const password_bcrypt = bcrypt.hashSync(password, 10); // sync
   let resultCode = 404;
+  const access_token = await jwt.sign(
+    {
+      user_id: user_id,
+      name: name,
+      nickname: nickname,
+    },
+    process.env.jwt_secret,
+    {expiresIn: "1h"} //만료 시간 1시간
+  );
+
+  const refresh_token = await jwt.sign(
+    {
+      user_id: user_id,
+    },
+    process.env.jwt_secret,
+    {expiresIn: "14d"}
+  );
   let message = "에러가 발생했습니다.";
   try {
     //문제 없으면 try문 실행
@@ -43,6 +60,7 @@ router.post("/", async (req, res, next) => {
       code: resultCode,
       message: message,
       user_id: user_id,
+      refresh_token: refresh_token,
     });
   } catch (err) {
     //에러 처리
