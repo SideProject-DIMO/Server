@@ -7,7 +7,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 router.post("/drop", async (req, res, next) => {
-  const {user_id} = req.query;
+  const {user_id} = req.body;
   let resultCode = 404;
   let message = "에러가 발생했습니다";
 
