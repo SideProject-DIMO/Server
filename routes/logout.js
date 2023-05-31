@@ -2,7 +2,7 @@ const pool = require("../db");
 const express = require("express");
 const router = express.Router();
 
-// logout
+// 로그아웃
 router.get("/logout", async (req, res) => {
   let resultCode = 404;
   let message = "에러가 발생했습니다";
