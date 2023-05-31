@@ -17,6 +17,7 @@ app.post("/kakao_login", require("./routes/kakao_login.js"));
 app.post("/google_login", require("./routes/google_login.js"));
 app.post("/login", require("./routes/standard_login.js"));
 app.get("/logout", require("./routes/logout"));
+app.post("/drop", require("./routes/drop.js"));
 
 //회원정보변경
 app.use("/user_info", require("./routes/change_user_info"));
