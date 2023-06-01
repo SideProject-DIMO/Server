@@ -3,6 +3,8 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 
+// 회원정보
+
 // 비밀번호 변경
 router.get("/change_pw", async (req, res, next) => {
   let user_id = req.query.user_id;
@@ -92,6 +94,32 @@ router.get("/change_nickname", async (req, res, next) => {
       message: message,
       user_id: user_id,
       nickname: nickname,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(err);
+  }
+});
+
+// mbti 변경
+router.get("/change_mbti", async (req, res, next) => {
+  let user_id = req.query.user_id;
+  let mbti = req.query.mbti;
+  try {
+    let now = new Date();
+    const [change_mbti] = await pool.execute(
+      `UPDATE user SET mbti = ? where user_id = ?`,
+      [mbti, user_id]
+    );
+
+    resultCode = 200;
+    message = "mbti가 성공적으로 변경되었습니다.";
+
+    return res.json({
+      code: resultCode,
+      message: message,
+      user_id: user_id,
+      mbti: mbti,
     });
   } catch (err) {
     console.error(err);
