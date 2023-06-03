@@ -85,15 +85,20 @@ router.get("/confirm_nickname", async (req, res, next) => {
   let user_id = req.query.user_id;
   let nickname = req.query.nickname;
   try {
+    const [nick_mod_time] = await pool.execute(
+      `SELECT updated_at FROM user WHERE user_id = ?`,
+      [user_id]
+    );
+
     const [nickname_dp] = await pool.execute(
-      `SELECT nickname, updated_at FROM user WHERE nickname = ?`,
+      `SELECT nickname FROM user WHERE nickname = ?`,
       [nickname]
     );
 
     now = new Date();
-    // 한달 = 2592000초
+    // 한달 = 2592000000밀리초
 
-    if (nickname_dp[0].updated_at > now - 2592000) {
+    if (now.getTime() - nick_mod_time[0].updated_at.getTime() < 2592000000) {
       resultCode = 401;
       message = "닉네임은 한 달에 한 번만 변경할 수 있습니다.";
 
