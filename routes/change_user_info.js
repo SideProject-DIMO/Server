@@ -9,7 +9,7 @@ router.get("/", async (req, res, next) => {
 
   try {
     const [check_user_info] = await pool.execute(
-      `SELECT nickname, mbti FROM user WHERE user_id = ?`,
+      `SELECT nickname, mbti, updated_at FROM user WHERE user_id = ?`,
       [user_id]
     );
     resultCode = 200;
@@ -21,6 +21,7 @@ router.get("/", async (req, res, next) => {
       user_id: user_id,
       nickname: check_user_info[0].nickname,
       mbti: check_user_info[0].mbti,
+      updated_at: check_user_info[0].updated_at,
     });
   } catch (err) {
     console.error(err);
@@ -79,7 +80,7 @@ router.get("/change_pw", async (req, res, next) => {
   }
 });
 
-// 닉네임 중복 확인
+// 닉네임 확인
 router.get("/confirm_nickname", async (req, res, next) => {
   let user_id = req.query.user_id;
   let nickname = req.query.nickname;
