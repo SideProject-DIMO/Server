@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 
-// 회원정보 받아오기(nickname, mbti)
+// 회원정보 받아오기(nickname, mbti, updated_at)
 router.get("/", async (req, res, next) => {
   let user_id = req.query.user_id;
 
@@ -85,10 +85,23 @@ router.get("/confirm_nickname", async (req, res, next) => {
   let nickname = req.query.nickname;
   try {
     const [nickname_dp] = await pool.execute(
-      `SELECT nickname FROM user WHERE nickname = ?`,
+      `SELECT nickname, updated_at FROM user WHERE nickname = ?`,
       [nickname]
     );
 
+    now = new Date();
+    // 한달 = 2592000초
+
+    if (nickname_dp[0].updated_at > now - 2592000) {
+      resultCode = 401;
+      message = "닉네임은 한 달에 한 번만 변경할 수 있습니다.";
+
+      return res.json({
+        code: resultCode,
+        message: message,
+        user_id: user_id,
+      });
+    }
     if (nickname_dp[0] == undefined) {
       resultCode = 200;
       message = "사용 가능한 닉네임입니다.";
