@@ -7,14 +7,14 @@ CREATE TABLE `user` (
   `sns_type` varchar(10) DEFAULT NULL,
   `agency` varchar(6) NOT NULL,
   `phone_number` varchar(15) NOT NULL,
-  `nickname` varchar(10) NOT NULL,
+  `nickname` varchar(10) DEFAULT NULL,
   `mbti` varchar(5) NOT NULL,
   `refresh_token` varchar(200) DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`user_no`),
   UNIQUE KEY `user_id` (`user_id`),
   UNIQUE KEY `nickname` (`nickname`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- 인증번호
 CREATE TABLE `sms_validation` (
