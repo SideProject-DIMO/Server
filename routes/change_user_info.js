@@ -85,29 +85,11 @@ router.get("/confirm_nickname", async (req, res, next) => {
   let user_id = req.query.user_id;
   let nickname = req.query.nickname;
   try {
-    const [nick_mod_time] = await pool.execute(
-      `SELECT updated_at FROM user WHERE user_id = ?`,
-      [user_id]
-    );
-
     const [nickname_dp] = await pool.execute(
       `SELECT nickname FROM user WHERE nickname = ?`,
       [nickname]
     );
 
-    now = new Date();
-    // 한달 = 2592000000밀리초
-
-    if (now.getTime() - nick_mod_time[0].updated_at.getTime() < 2592000000) {
-      resultCode = 401;
-      message = "닉네임은 한 달에 한 번만 변경할 수 있습니다.";
-
-      return res.json({
-        code: resultCode,
-        message: message,
-        user_id: user_id,
-      });
-    }
     if (nickname_dp[0] == undefined) {
       resultCode = 200;
       message = "사용 가능한 닉네임입니다.";
@@ -131,7 +113,26 @@ router.get("/change_nickname", async (req, res, next) => {
   let user_id = req.query.user_id;
   let nickname = req.query.nickname;
   try {
+    const [nick_mod_time] = await pool.execute(
+      `SELECT updated_at FROM user WHERE user_id = ?`,
+      [user_id]
+    );
     let now = new Date();
+    // 한달 = 2592000000밀리초
+
+    if (
+      nick_mod_time[0].updated_at != undefined &&
+      now.getTime() - nick_mod_time[0].updated_at.getTime() < 2592000000
+    ) {
+      resultCode = 401;
+      message = "닉네임은 한 달에 한 번만 변경할 수 있습니다.";
+
+      return res.json({
+        code: resultCode,
+        message: message,
+        user_id: user_id,
+      });
+    }
     const [change_nickname] = await pool.execute(
       `UPDATE user SET nickname = ?, updated_at = ? where user_id = ?`,
       [nickname, now, user_id]
