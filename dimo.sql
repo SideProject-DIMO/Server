@@ -10,12 +10,12 @@ CREATE TABLE `user` (
   `nickname` varchar(10) DEFAULT NULL,
   `mbti` varchar(5) NOT NULL,
   `refresh_token` varchar(200) DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
+  `update_at_nickname` timestamp NULL DEFAULT NULL,
+  `updated_at_mbti` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`user_no`),
   UNIQUE KEY `user_id` (`user_id`),
   UNIQUE KEY `nickname` (`nickname`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 -- 인증번호
 CREATE TABLE `sms_validation` (
   `phone_number` varchar(15) NOT NULL,
