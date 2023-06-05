@@ -9,7 +9,7 @@ router.get("/", async (req, res, next) => {
 
   try {
     const [check_user_info] = await pool.execute(
-      `SELECT nickname, mbti, updated_at FROM user WHERE user_id = ?`,
+      `SELECT nickname, mbti, updated_at_nickname, updated_at_mbti FROM user WHERE user_id = ?`,
       [user_id]
     );
     resultCode = 200;
@@ -21,7 +21,8 @@ router.get("/", async (req, res, next) => {
       user_id: user_id,
       nickname: check_user_info[0].nickname,
       mbti: check_user_info[0].mbti,
-      updated_at: check_user_info[0].updated_at,
+      updated_at_nickname: check_user_info[0].updated_at_nickname,
+      updated_at_mbti: check_user_info[0].updated_at_mbti,
     });
   } catch (err) {
     console.error(err);
