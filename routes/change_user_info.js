@@ -114,15 +114,16 @@ router.get("/change_nickname", async (req, res, next) => {
   let nickname = req.query.nickname;
   try {
     const [nick_mod_time] = await pool.execute(
-      `SELECT updated_at FROM user WHERE user_id = ?`,
+      `SELECT updated_at_nickname FROM user WHERE user_id = ?`,
       [user_id]
     );
     let now = new Date();
     // 한달 = 2592000000밀리초
 
     if (
-      nick_mod_time[0].updated_at != undefined &&
-      now.getTime() - nick_mod_time[0].updated_at.getTime() < 2592000000
+      nick_mod_time[0].updated_at_nickname != undefined &&
+      now.getTime() - nick_mod_time[0].updated_at_nickname.getTime() <
+        2592000000
     ) {
       resultCode = 401;
       message = "닉네임은 한 달에 한 번만 변경할 수 있습니다.";
@@ -134,7 +135,7 @@ router.get("/change_nickname", async (req, res, next) => {
       });
     }
     const [change_nickname] = await pool.execute(
-      `UPDATE user SET nickname = ?, updated_at = ? where user_id = ?`,
+      `UPDATE user SET nickname = ?, updated_at_nickname = ? where user_id = ?`,
       [nickname, now, user_id]
     );
 
@@ -159,9 +160,11 @@ router.get("/change_mbti", async (req, res, next) => {
   let mbti = req.query.mbti;
   try {
     const [confirm_mbti] = await pool.execute(
-      `SELECT mbti FROM user WHERE user_id = ?`,
+      `SELECT mbti, updated_at_mbti FROM user WHERE user_id = ?`,
       [user_id]
     );
+
+    let now = new Date();
 
     if (confirm_mbti[0].mbti.toUpperCase() == mbti.toUpperCase()) {
       resultCode = 401;
@@ -171,11 +174,22 @@ router.get("/change_mbti", async (req, res, next) => {
         message: message,
         user_id: user_id,
       });
+    } else if (
+      confirm_mbti[0].updated_at_mbti != null &&
+      now.getTime() - confirm_mbti[0].updated_at_mbti.getTime() < 2592000000
+    ) {
+      resultCode = 401;
+      message = "mbti는 한 달에 한 번만 변경할 수 있습니다.";
+      return res.json({
+        code: resultCode,
+        message: message,
+        user_id: user_id,
+      });
     }
 
     const [change_mbti] = await pool.execute(
-      `UPDATE user SET mbti = ? WHERE user_id = ?`,
-      [mbti, user_id]
+      `UPDATE user SET mbti = ?, updated_at_mbti = ? WHERE user_id = ?`,
+      [mbti, now, user_id]
     );
 
     resultCode = 200;
