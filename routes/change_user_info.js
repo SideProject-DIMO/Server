@@ -81,7 +81,7 @@ router.get("/change_pw", async (req, res, next) => {
   }
 });
 
-// 닉네임 확인
+// 닉네임 중복 확인
 router.get("/confirm_nickname", async (req, res, next) => {
   let user_id = req.query.user_id;
   let nickname = req.query.nickname;
@@ -109,10 +109,9 @@ router.get("/confirm_nickname", async (req, res, next) => {
   }
 });
 
-// 닉네임 변경
-router.get("/change_nickname", async (req, res, next) => {
+//닉네임 수정날짜 확인
+router.get("/cofirm_nickname_modify", async (req, res, next) => {
   let user_id = req.query.user_id;
-  let nickname = req.query.nickname;
   try {
     const [nick_mod_time] = await pool.execute(
       `SELECT updated_at_nickname FROM user WHERE user_id = ?`,
@@ -128,13 +127,28 @@ router.get("/change_nickname", async (req, res, next) => {
     ) {
       resultCode = 401;
       message = "닉네임은 한 달에 한 번만 변경할 수 있습니다.";
-
-      return res.json({
-        code: resultCode,
-        message: message,
-        user_id: user_id,
-      });
+    } else {
+      resultCode = 200;
+      message = "닉네임을 변경할 수 있습니다.";
     }
+    return res.json({
+      code: resultCode,
+      message: message,
+      user_id: user_id,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(err);
+  }
+});
+
+// 닉네임 변경
+router.get("/change_nickname", async (req, res, next) => {
+  let user_id = req.query.user_id;
+  let nickname = req.query.nickname;
+  try {
+    let now = new Date();
+
     const [change_nickname] = await pool.execute(
       `UPDATE user SET nickname = ?, updated_at_nickname = ? where user_id = ?`,
       [nickname, now, user_id]
@@ -155,13 +169,45 @@ router.get("/change_nickname", async (req, res, next) => {
   }
 });
 
+//mbti 수정날짜 확인
+router.get("/cofirm_mbti_modify", async (req, res, next) => {
+  let user_id = req.query.user_id;
+  try {
+    const [confirm_mbti] = await pool.execute(
+      `SELECT updated_at_mbti FROM user WHERE user_id = ?`,
+      [user_id]
+    );
+
+    let now = new Date();
+
+    if (
+      confirm_mbti[0].updated_at_mbti != null &&
+      now.getTime() - confirm_mbti[0].updated_at_mbti.getTime() < 2592000000
+    ) {
+      resultCode = 401;
+      message = "mbti는 한 달에 한 번만 변경할 수 있습니다.";
+    } else {
+      resultCode = 200;
+      message = "mbti를 변경할 수 있습니다.";
+    }
+    return res.json({
+      code: resultCode,
+      message: message,
+      user_id: user_id,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(err);
+  }
+});
+
 // mbti 변경
 router.get("/change_mbti", async (req, res, next) => {
   let user_id = req.query.user_id;
   let mbti = req.query.mbti;
   try {
     const [confirm_mbti] = await pool.execute(
-      `SELECT mbti, updated_at_mbti FROM user WHERE user_id = ?`,
+      `SELECT mbti FROM user WHERE user_id = ?`,
       [user_id]
     );
 
@@ -170,17 +216,6 @@ router.get("/change_mbti", async (req, res, next) => {
     if (confirm_mbti[0].mbti.toUpperCase() == mbti.toUpperCase()) {
       resultCode = 401;
       message = "바꾸려는 mbti가 동일합니다.";
-      return res.json({
-        code: resultCode,
-        message: message,
-        user_id: user_id,
-      });
-    } else if (
-      confirm_mbti[0].updated_at_mbti != null &&
-      now.getTime() - confirm_mbti[0].updated_at_mbti.getTime() < 2592000000
-    ) {
-      resultCode = 401;
-      message = "mbti는 한 달에 한 번만 변경할 수 있습니다.";
       return res.json({
         code: resultCode,
         message: message,
