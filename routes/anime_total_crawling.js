@@ -1,59 +1,59 @@
-const puppeteer = require('puppeteer');
-const express = require('express');
-const readline = require('readline');
-const fs = require('fs');
+const pool = require("../db");
+const puppeteer = require("puppeteer");
+const express = require("express");
+const router = express.Router();
+const readline = require("readline");
+const fs = require("fs");
 
-const app = express();
-
-app.get('/animedata', async (req, res) => {
+router.get("/animedata", async (req, res) => {
   try {
     // 크롤링 시작
-    const puppeteer = require('puppeteer');
-    const browser = await puppeteer.launch({ headless: true });
+    const puppeteer = require("puppeteer");
+    const browser = await puppeteer.launch({headless: true});
 
     //urls.txt 크롤링 순환
-    const urls = fs.readFileSync('urls.txt', 'utf-8').split('\n');
+    const urls = fs.readFileSync("urls.txt", "utf-8").split("\n");
 
     const results = [];
     for (const url of urls) {
-      if (url.trim() !== '') {
+      if (url.trim() !== "") {
         const page = await browser.newPage();
         await page.goto(url.trim());
 
         // 프로필+캐릭터명, 작품명, 줄거리
-        const grabData = await page.$$eval('.view-chacon li', (items) => {
+        const grabData = await page.$$eval(".view-chacon li", (items) => {
           const data = [];
 
           for (const item of items) {
-            const photoDiv = item.querySelector('.photo');
-            const listDiv = item.querySelector('.list');
-            let characterImg = '';
-            let characterName = '';
+            const photoDiv = item.querySelector(".photo");
+            const listDiv = item.querySelector(".list");
+            let characterImg = "";
+            let characterName = "";
 
             if (photoDiv) {
-              const img = photoDiv.querySelector('img');
+              const img = photoDiv.querySelector("img");
               if (img) {
-                characterImg = img.getAttribute('src');
+                characterImg = img.getAttribute("src");
               }
             }
 
             if (listDiv) {
-              const box1 = listDiv.querySelector('.box1');
+              const box1 = listDiv.querySelector(".box1");
               if (box1) {
-                characterName = box1.querySelector('.name').textContent;
+                characterName = box1.querySelector(".name").textContent;
               }
             }
 
-            data.push({ characterImg, characterName });
+            data.push({characterImg, characterName});
           }
 
-          const titleTag = document.querySelector('.view-title h1');
-          const title = titleTag ? titleTag.innerHTML : '';
+          const titleTag = document.querySelector(".view-title h1");
+          const title = titleTag ? titleTag.innerHTML : "";
 
-          const plotTag = document.querySelector('.c');
-          const plot = plotTag ? plotTag.innerHTML : '';
+          const plotTag = document.querySelector(".c");
+          const plot = plotTag ? plotTag.innerHTML : "";
 
-          return { title, plot, items: data };
+          return {title, plot, items: data};
         });
 
         // 장르
@@ -111,11 +111,9 @@ app.get('/animedata', async (req, res) => {
 
     res.json(results);
   } catch (error) {
-    console.error('Error during crawling:', error);
-    res.status(500).send('Error during crawling');
+    console.error("Error during crawling:", error);
+    res.status(500).send("Error during crawling");
   }
 });
 
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
-});
+module.exports = router;
