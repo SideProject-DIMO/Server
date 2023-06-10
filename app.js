@@ -22,8 +22,8 @@ app.post("/drop", require("./routes/drop.js"));
 //회원정보변경
 app.use("/user_info", require("./routes/change_user_info"));
 
-//애니메이션 크롤링
-// app.use("/crawling", require("./routes/animeData.js"));
+//크롤링
+app.use("/crawling", require("./routes/anime_crawling.js"));
 
 app.use(require("./routes/auth_middleware"));
 
