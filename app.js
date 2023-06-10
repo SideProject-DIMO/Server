@@ -23,7 +23,7 @@ app.post("/drop", require("./routes/drop.js"));
 app.use("/user_info", require("./routes/change_user_info"));
 
 //크롤링
-app.use("/crawling", require("./routes/anime_total_crawling.js"));
+app.use("/crawling", require("./routes/anime_data_crawling.js"));
 
 app.use(require("./routes/auth_middleware"));
 
