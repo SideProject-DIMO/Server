@@ -20,6 +20,16 @@ router.get("/animedata", async (req, res) => {
         const page = await browser.newPage();
         await page.goto(url.trim());
 
+        // 콘텐츠 고유번호 추출
+        const contentId = url.match(/\.com\/(\d+)/)[1];
+
+        // 포스터 이미지
+        const posterElement = await page.$('.view-info .image img');
+        const posterImg = await page.evaluate(
+          (element) => element.getAttribute('src'),
+          posterElement
+        );
+
         // 프로필+캐릭터명, 작품명, 줄거리
         const grabData = await page.$$eval(".view-chacon li", (items) => {
           const data = [];
@@ -93,6 +103,8 @@ router.get("/animedata", async (req, res) => {
         );
 
         results.push({
+          contentId: contentId,
+          poster: posterImg,
           title: grabData.title,
           plot: grabData.plot,
           genre: genre,
