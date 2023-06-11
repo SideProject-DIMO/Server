@@ -16,6 +16,7 @@ CREATE TABLE `user` (
   UNIQUE KEY `user_id` (`user_id`),
   UNIQUE KEY `nickname` (`nickname`)
 ) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 -- 인증번호
 CREATE TABLE `sms_validation` (
   `phone_number` varchar(15) NOT NULL,
@@ -36,6 +37,13 @@ CREATE TABLE `movie_contents` (
   `character_name` varchar(30) NOT NULL,
   `character_mbti` varchar(5) DEFAULT NULL,
   PRIMARY KEY (`movie_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- 탈퇴 사유
+CREATE TABLE `drop_reason` (
+  `drop_id` int NOT NULL AUTO_INCREMENT,
+  `drop_reason` varchar(100) NOT NULL,
+  PRIMARY KEY (`drop_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- 콘텐츠 애니메이션 
