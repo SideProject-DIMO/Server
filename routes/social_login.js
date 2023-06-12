@@ -9,8 +9,10 @@ router.post("/", async (req, res, next) => {
   let resultCode = 404;
   let message = "에러가 발생했습니다.";
   try {
+    console.log(nickname);
+    console.log(mbti);
     let [insert_mbti] = await pool.execute(
-      `UPDATE user SET nickname =? and mbti =? WHERE user_id =?`,
+      `UPDATE user SET nickname =?, mbti =? WHERE user_id =?`,
       [nickname, mbti, user_id]
     );
     resultCode = 200;
@@ -19,6 +21,8 @@ router.post("/", async (req, res, next) => {
       code: resultCode,
       message: message,
       user_id: user_id,
+      nickname: nickname,
+      mbti: mbti,
     });
   } catch (err) {
     console.error(err);
