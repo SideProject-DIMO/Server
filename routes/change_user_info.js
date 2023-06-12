@@ -121,7 +121,7 @@ router.get("/cofirm_nickname_modify", async (req, res, next) => {
     // 한달 = 2592000000밀리초
 
     if (
-      nick_mod_time[0].updated_at_nickname != undefined &&
+      nick_mod_time[0].updated_at_nickname != null &&
       now.getTime() - nick_mod_time[0].updated_at_nickname.getTime() <
         2592000000
     ) {
