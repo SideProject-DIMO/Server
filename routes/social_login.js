@@ -68,39 +68,39 @@ router.post("/google_login", async (req, res, next) => {
     let data = await pool.query("SELECT * FROM user WHERE user_id = ?", [
       user_id,
     ]);
+
+    //계정이 없다면
+    access_token = await jwt.sign(
+      {
+        user_id: user_id,
+        name: name,
+      },
+      process.env.jwt_secret,
+      {
+        expiresIn: "1h",
+      } //만료 시간 1시간
+    );
+
+    refresh_token = await jwt.sign(
+      {
+        user_id: user_id,
+      },
+      process.env.jwt_secret,
+      {
+        expiresIn: "14d",
+      }
+    );
+
+    res.cookie("access_token", access_token, {
+      httpOnly: true,
+      maxAge: 60000 * 60,
+    });
+
+    res.cookie("refresh_token", refresh_token, {
+      httpOnly: true,
+      maxAge: 60000 * 60 * 24 * 14,
+    });
     if (data[0][0] == undefined) {
-      //계정이 없다면
-      access_token = await jwt.sign(
-        {
-          user_id: user_id,
-          name: name,
-        },
-        process.env.jwt_secret,
-        {
-          expiresIn: "1h",
-        } //만료 시간 1시간
-      );
-
-      refresh_token = await jwt.sign(
-        {
-          user_id: user_id,
-        },
-        process.env.jwt_secret,
-        {
-          expiresIn: "14d",
-        }
-      );
-
-      res.cookie("access_token", access_token, {
-        httpOnly: true,
-        maxAge: 60000 * 60,
-      });
-
-      res.cookie("refresh_token", refresh_token, {
-        httpOnly: true,
-        maxAge: 60000 * 60 * 24 * 14,
-      });
-
       let data2 = await pool.query(
         "INSERT INTO user (user_id, name, sns_type, refresh_token) VALUES (?, ?, ?, ?)",
         [user_id, name, sns_type, refresh_token]
@@ -109,6 +109,10 @@ router.post("/google_login", async (req, res, next) => {
       message = "구글 계정 회원가입 성공!";
     } else {
       //로그인
+      let data2 = await pool.query(
+        "UPDATE user SET refresh_token=? WHERE user_id = ?",
+        [refresh_token, user_id]
+      );
       resultCode = 200;
       message = data[0][0].name + "님 환영합니다!";
     }
@@ -136,37 +140,38 @@ router.post("/kakao_login", async (req, res, next) => {
     let data = await pool.query("SELECT * FROM user WHERE user_id = ?", [
       user_id,
     ]);
+
+    access_token = await jwt.sign(
+      {
+        user_id: user_id,
+        name: name,
+      },
+      process.env.jwt_secret,
+      {
+        expiresIn: "1h",
+      } //만료 시간 1시간
+    );
+
+    refresh_token = await jwt.sign(
+      {
+        user_id: user_id,
+      },
+      process.env.jwt_secret,
+      {
+        expiresIn: "14d",
+      }
+    );
+
+    res.cookie("access_token", access_token, {
+      httpOnly: true,
+      maxAge: 60000 * 60,
+    });
+
+    res.cookie("refresh_token", refresh_token, {
+      httpOnly: true,
+      maxAge: 60000 * 60 * 24 * 14,
+    });
     if (data[0][0] == undefined) {
-      access_token = await jwt.sign(
-        {
-          user_id: user_id,
-          name: name,
-        },
-        process.env.jwt_secret,
-        {
-          expiresIn: "1h",
-        } //만료 시간 1시간
-      );
-
-      refresh_token = await jwt.sign(
-        {
-          user_id: user_id,
-        },
-        process.env.jwt_secret,
-        {
-          expiresIn: "14d",
-        }
-      );
-
-      res.cookie("access_token", access_token, {
-        httpOnly: true,
-        maxAge: 60000 * 60,
-      });
-
-      res.cookie("refresh_token", refresh_token, {
-        httpOnly: true,
-        maxAge: 60000 * 60 * 24 * 14,
-      });
       data = await pool.query(
         "INSERT INTO user (user_id, name, sns_type, refresh_token) VALUES (?, ?, ?, ?)",
         [user_id, name, sns_type, refresh_token]
@@ -175,6 +180,10 @@ router.post("/kakao_login", async (req, res, next) => {
       message = "카카오 계정 회원가입 성공!";
     } else {
       //로그인
+      let data2 = await pool.query(
+        "UPDATE user SET refresh_token=? WHERE user_id = ?",
+        [refresh_token, user_id]
+      );
       resultCode = 200;
       message = data[0][0].name + "님 환영합니다!";
     }
