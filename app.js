@@ -14,7 +14,6 @@ app.use("/signup", require("./routes/dimo_signup.js"));
 
 //로그인&로그아웃&탈퇴
 app.use("/social", require("./routes/social_login.js"));
-// app.post("/google_login", require("./routes/social_login.js"));
 app.post("/login", require("./routes/standard_login.js"));
 app.get("/logout", require("./routes/logout"));
 app.post("/drop", require("./routes/drop.js"));
