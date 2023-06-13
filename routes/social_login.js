@@ -65,7 +65,7 @@ router.post("/google_login", async (req, res, next) => {
   let refresh_token, access_token;
 
   try {
-    let data = await pool.query("SELECT * FROM user WHERE user_id = ?", [
+    let [data] = await pool.execute("SELECT * FROM user WHERE user_id = ?", [
       user_id,
     ]);
 
@@ -100,8 +100,8 @@ router.post("/google_login", async (req, res, next) => {
       httpOnly: true,
       maxAge: 60000 * 60 * 24 * 14,
     });
-    if (data[0][0] == undefined) {
-      let data2 = await pool.query(
+    if (data[0] == undefined) {
+      let [data2] = await pool.execute(
         "INSERT INTO user (user_id, name, sns_type, refresh_token) VALUES (?, ?, ?, ?)",
         [user_id, name, sns_type, refresh_token]
       );
@@ -109,12 +109,12 @@ router.post("/google_login", async (req, res, next) => {
       message = "구글 계정 회원가입 성공!";
     } else {
       //로그인
-      let data2 = await pool.query(
+      let [data2] = await pool.execute(
         "UPDATE user SET refresh_token=? WHERE user_id = ?",
         [refresh_token, user_id]
       );
       resultCode = 200;
-      message = data[0][0].name + "님 환영합니다!";
+      message = data[0].name + "님 환영합니다!";
     }
     return res.json({
       code: resultCode,
@@ -137,7 +137,7 @@ router.post("/kakao_login", async (req, res, next) => {
   let refresh_token, access_token;
 
   try {
-    let data = await pool.query("SELECT * FROM user WHERE user_id = ?", [
+    let [data] = await pool.execute("SELECT * FROM user WHERE user_id = ?", [
       user_id,
     ]);
 
@@ -171,8 +171,8 @@ router.post("/kakao_login", async (req, res, next) => {
       httpOnly: true,
       maxAge: 60000 * 60 * 24 * 14,
     });
-    if (data[0][0] == undefined) {
-      data = await pool.query(
+    if (data[0] == undefined) {
+      data = await pool.execute(
         "INSERT INTO user (user_id, name, sns_type, refresh_token) VALUES (?, ?, ?, ?)",
         [user_id, name, sns_type, refresh_token]
       );
@@ -180,12 +180,12 @@ router.post("/kakao_login", async (req, res, next) => {
       message = "카카오 계정 회원가입 성공!";
     } else {
       //로그인
-      let data2 = await pool.query(
+      let [data2] = await pool.execute(
         "UPDATE user SET refresh_token=? WHERE user_id = ?",
         [refresh_token, user_id]
       );
       resultCode = 200;
-      message = data[0][0].name + "님 환영합니다!";
+      message = data[0].name + "님 환영합니다!";
     }
     res.json({
       code: resultCode,
