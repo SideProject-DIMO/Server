@@ -24,9 +24,9 @@ router.get("/animedata", async (req, res) => {
         const contentId = url.match(/\.com\/(\d+)/)[1];
 
         // 포스터 이미지
-        const posterElement = await page.$('.view-info .image img');
+        const posterElement = await page.$(".view-info .image img");
         const posterImg = await page.evaluate(
-          (element) => element.getAttribute('src'),
+          (element) => element.getAttribute("src"),
           posterElement
         );
 
@@ -101,6 +101,11 @@ router.get("/animedata", async (req, res) => {
           (element) => element.textContent,
           rateElement[0]
         );
+
+        // const [save_anime_data] = await pool.execute(
+        //   `INSERT INTO anime_contents anime_content_id VALUES (?)`,
+        //   [contentId]
+        // );
 
         results.push({
           contentId: contentId,
