@@ -102,10 +102,10 @@ router.get("/animedata", async (req, res) => {
           rateElement[0]
         );
 
-        const [save_anime_data] = await pool.execute(
-          `INSERT INTO anime_contents anime_content_id VALUES (?)`,
-          [contentId]
-        );
+        // const [save_anime_data] = await pool.execute(
+        //   `INSERT INTO anime_contents anime_content_id VALUES (?)`,
+        //   [contentId]
+        // );
 
         results.push({
           contentId: contentId,
