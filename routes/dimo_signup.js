@@ -40,7 +40,7 @@ router.post("/", async (req, res, next) => {
   let message = "에러가 발생했습니다.";
   try {
     //문제 없으면 try문 실행
-    const data = await pool.query(
+    const [data] = await pool.execute(
       "INSERT INTO user (user_id, password, name, sns_type, agency, phone_number, nickname, mbti, refresh_token) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [
         user_id,
