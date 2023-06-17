@@ -45,3 +45,11 @@ CREATE TABLE `anime_contents` (
   `anime_content_id` int DEFAULT NULL,
   PRIMARY KEY (`anime_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- 좋아요
+CREATE TABLE `dimo_like` (
+  `like_id` int NOT NULL AUTO_INCREMENT,
+  `content_type` varchar(10) NOT NULL,
+  `content_id` int NOT NULL,
+  PRIMARY KEY (`like_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
