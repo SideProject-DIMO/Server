@@ -9,7 +9,9 @@ router.get("/animedata", async (req, res) => {
   try {
     // 크롤링 시작
     const puppeteer = require("puppeteer");
-    const browser = await puppeteer.launch({headless: true});
+    const browser = await puppeteer.launch({
+      headless: true,
+    });
 
     //urls.txt 크롤링 순환
     const urls = fs.readFileSync("urls.txt", "utf-8").split("\n");
@@ -54,7 +56,10 @@ router.get("/animedata", async (req, res) => {
               }
             }
 
-            data.push({characterImg, characterName});
+            data.push({
+              characterImg,
+              characterName,
+            });
           }
 
           const titleTag = document.querySelector(".view-title h1");
@@ -63,7 +68,11 @@ router.get("/animedata", async (req, res) => {
           const plotTag = document.querySelector(".c");
           const plot = plotTag ? plotTag.innerHTML : "";
 
-          return {title, plot, items: data};
+          return {
+            title,
+            plot,
+            items: data,
+          };
         });
 
         // 장르
@@ -102,10 +111,19 @@ router.get("/animedata", async (req, res) => {
           rateElement[0]
         );
 
-        // const [save_anime_data] = await pool.execute(
-        //   `INSERT INTO anime_contents anime_content_id VALUES (?)`,
+        //콘텐츠 업데이트 시, 사용
+
+        // const [check_anime_data] = await pool.execute(
+        //   `SELECT anime_content_id FROM anime_contents WHERE anime_content_id = ? `,
         //   [contentId]
         // );
+
+        // if (check_anime_data[0] == null) {
+        //   const [save_anime_data] = await pool.execute(
+        //     `INSERT INTO anime_contents (anime_content_id) VALUES (?)`,
+        //     [contentId]
+        //   );
+        // }
 
         results.push({
           contentId: contentId,
