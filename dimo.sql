@@ -43,8 +43,9 @@ CREATE TABLE `drop_reason` (
 CREATE TABLE `anime_contents` (
   `anime_id` int NOT NULL AUTO_INCREMENT,
   `anime_content_id` int DEFAULT NULL,
+  `url_type` int NOT NULL, -- type 0이면 /nav/good, 1이면 /nav/quarter, 2면 /
   PRIMARY KEY (`anime_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=220 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- 좋아요
 CREATE TABLE `dimo_like` (
