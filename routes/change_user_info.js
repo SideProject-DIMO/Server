@@ -110,7 +110,7 @@ router.get("/confirm_nickname", async (req, res, next) => {
 });
 
 //닉네임 수정날짜 확인
-router.get("/cofirm_nickname_modify", async (req, res, next) => {
+router.get("/confirm_nickname_modify", async (req, res, next) => {
   let user_id = req.query.user_id;
   try {
     const [nick_mod_time] = await pool.execute(
@@ -170,7 +170,7 @@ router.get("/change_nickname", async (req, res, next) => {
 });
 
 //mbti 수정날짜 확인
-router.get("/cofirm_mbti_modify", async (req, res, next) => {
+router.get("/confirm_mbti_modify", async (req, res, next) => {
   let user_id = req.query.user_id;
   try {
     const [confirm_mbti] = await pool.execute(
