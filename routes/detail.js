@@ -24,7 +24,6 @@ router.get("/animedata/:content_id", async (req, res) => {
       url += content_id;
     }
     // 크롤링 시작
-    const puppeteer = require("puppeteer");
     const browser = await puppeteer.launch({
       headless: true,
     });
