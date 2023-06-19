@@ -8,7 +8,6 @@ const fs = require("fs");
 router.get("/animedata", async (req, res) => {
   try {
     // 크롤링 시작
-    const puppeteer = require("puppeteer");
     const browser = await puppeteer.launch({
       headless: true,
     });
@@ -21,7 +20,7 @@ router.get("/animedata", async (req, res) => {
       if (url.trim() !== "") {
         const page = await browser.newPage();
         await page.goto(url.trim());
-
+         
         // 콘텐츠 고유번호 추출
         const contentId = url.match(/\.com\/(\d+)/)[1];
 
