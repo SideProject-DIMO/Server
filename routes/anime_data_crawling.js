@@ -16,11 +16,11 @@ router.get("/animedata", async (req, res) => {
     const urls = fs.readFileSync("urls.txt", "utf-8").split("\n");
 
     const results = [];
-    for (const url of urls) {
+    for (let url of urls) {
       if (url.trim() !== "") {
         const page = await browser.newPage();
         await page.goto(url.trim());
-         
+
         // 콘텐츠 고유번호 추출
         const contentId = url.match(/\.com\/(\d+)/)[1];
 
@@ -111,6 +111,12 @@ router.get("/animedata", async (req, res) => {
         );
 
         //콘텐츠 업데이트 시, 사용
+        let url_type = 2;
+        if (url.indexOf("good") != -1) {
+          url_type = 0;
+        } else if (url.indexOf("quarter") != -1) {
+          url_type = 1;
+        }
 
         // const [check_anime_data] = await pool.execute(
         //   `SELECT anime_content_id FROM anime_contents WHERE anime_content_id = ? `,
@@ -119,8 +125,8 @@ router.get("/animedata", async (req, res) => {
 
         // if (check_anime_data[0] == null) {
         //   const [save_anime_data] = await pool.execute(
-        //     `INSERT INTO anime_contents (anime_content_id) VALUES (?)`,
-        //     [contentId]
+        //     `INSERT INTO anime_contents (anime_content_id, url_type) VALUES (?, ?)`,
+        //     [contentId, url_type]
         //   );
         // }
 
