@@ -3,11 +3,30 @@ const puppeteer = require("puppeteer");
 const express = require("express");
 const router = express.Router();
 
-router.post("/like", async (req, res) => {});
+router.post("/like", async (req, res, next) => {
+  const {user_id, content_type, content_id} = req.body;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+  try {
+    const [like] = await pool.execute(
+      `INSERT INTO dimo_like (content_type, content_id, user_id) VALUES (?, ?, ?)`,
+      [content_type, content_id, user_id]
+    );
+    result_code = 200;
+    message = "좋아요를 눌렀습니다.";
+    return res.json({
+      code: result_code,
+      message: message,
+      user_id: user_id,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(err);
+  }
+});
 
-router.post("/dislike", async (req, res) => {});
 
-router.get("/animedata/:content_id", async (req, res) => {
+router.get("/animedata/:content_id", async (req, res, next) => {
   try {
     let content_id = req.params.content_id;
     let [detail] = await pool.execute(
@@ -29,13 +48,8 @@ router.get("/animedata/:content_id", async (req, res) => {
     });
 
     const results = [];
-    // for (const url of urls) {
-    // if (url.trim() !== "") {
     const page = await browser.newPage();
     await page.goto(url.trim());
-
-    // 콘텐츠 고유번호 추출
-    //   const contentId = url.match(/\.com\/(\d+)/)[1];
 
     // 포스터 이미지
     const posterElement = await page.$(".view-info .image img");
@@ -136,8 +150,6 @@ router.get("/animedata/:content_id", async (req, res) => {
     });
 
     await page.close();
-    // }
-    // }
 
     await browser.close();
     // 크롤링 종료
