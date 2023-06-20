@@ -25,6 +25,27 @@ router.post("/like", async (req, res, next) => {
   }
 });
 
+router.post("/dislike", async (req, res, next) => {
+  const {user_id, content_type, content_id} = req.body;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+  try {
+    const [dislike] = await pool.execute(
+      `DELETE FROM dimo_like WHERE user_id = ? and content_type = ? and content_id = ?`,
+      [user_id, content_type, content_id]
+    );
+    result_code = 200;
+    message = "좋아요를 취소했습니다.";
+    return res.json({
+      code: result_code,
+      message: message,
+      user_id: user_id,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(err);
+  }
+});
 
 router.get("/animedata/:content_id", async (req, res, next) => {
   try {
