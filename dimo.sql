@@ -49,8 +49,9 @@ CREATE TABLE `anime_contents` (
 
 -- 좋아요
 CREATE TABLE `dimo_like` (
-  `like_id` int NOT NULL AUTO_INCREMENT,
+  `like_id` int(11) NOT NULL AUTO_INCREMENT,
   `content_type` varchar(10) NOT NULL,
-  `content_id` int NOT NULL,
+  `content_id` int(11) NOT NULL,
+  `user_id` varchar(30) NOT NULL,
   PRIMARY KEY (`like_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
