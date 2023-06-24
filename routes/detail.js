@@ -66,6 +66,7 @@ router.get("/animedata/:content_id", async (req, res, next) => {
     // 크롤링 시작
     const browser = await puppeteer.launch({
       headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
 
     const results = [];
