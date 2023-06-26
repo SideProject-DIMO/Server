@@ -4,13 +4,13 @@ const express = require("express");
 const router = express.Router();
 
 router.post("/like", async (req, res, next) => {
-  const {user_id, content_type, content_id} = req.body;
+  const {user_id, content_type, contentId} = req.body;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
     const [like] = await pool.execute(
       `INSERT INTO dimo_like (content_type, content_id, user_id) VALUES (?, ?, ?)`,
-      [content_type, content_id, user_id]
+      [content_type, contentId, user_id]
     );
     result_code = 200;
     message = "좋아요를 눌렀습니다.";
@@ -26,13 +26,13 @@ router.post("/like", async (req, res, next) => {
 });
 
 router.post("/dislike", async (req, res, next) => {
-  const {user_id, content_type, content_id} = req.body;
+  const {user_id, content_type, contentId} = req.body;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
     const [dislike] = await pool.execute(
       `DELETE FROM dimo_like WHERE user_id = ? and content_type = ? and content_id = ?`,
-      [user_id, content_type, content_id]
+      [user_id, content_type, contentId]
     );
     result_code = 200;
     message = "좋아요를 취소했습니다.";
@@ -47,21 +47,23 @@ router.post("/dislike", async (req, res, next) => {
   }
 });
 
-router.get("/animedata/:content_id", async (req, res, next) => {
+router.get("/animedata/:contentId", async (req, res, next) => {
   try {
-    let content_id = req.params.content_id;
+    let contentId = req.params.contentId;
     let [detail] = await pool.execute(
       `SELECT url_type FROM anime_contents WHERE anime_content_id = ?`,
-      [content_id]
+      [contentId]
     );
+
+    console.log(detail[0].url_type);
 
     let url = "https://anime.onnada.com/";
     if (detail[0].url_type == 0) {
-      url += content_id + "/nav/good";
+      url += contentId + "/nav/good";
     } else if (detail[0].url_type == 2) {
-      url += content_id + "/nav/quarter";
+      url += contentId + "/nav/quarter";
     } else {
-      url += content_id;
+      url += contentId;
     }
     // 크롤링 시작
     const browser = await puppeteer.launch({
@@ -160,7 +162,7 @@ router.get("/animedata/:content_id", async (req, res, next) => {
     );
 
     results.push({
-      content_id: content_id,
+      contentId: contentId,
       poster: posterImg,
       title: grabData.title,
       plot: grabData.plot,
@@ -176,7 +178,7 @@ router.get("/animedata/:content_id", async (req, res, next) => {
     await browser.close();
     // 크롤링 종료
 
-    res.json(results);
+    res.json(results[0]);
   } catch (error) {
     console.error("Error during crawling:", error);
     res.status(500).send("Error during crawling");
