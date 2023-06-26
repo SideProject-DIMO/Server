@@ -27,6 +27,9 @@ app.use("/crawling", require("./routes/anime_data_crawling.js"));
 //상세 조회
 app.use("/detail", require("./routes/detail.js"));
 
+//나의 모멘텀 조회
+app.use("/my_momentum", require("./routes/my_momentum.js"));
+
 app.use(require("./routes/auth_middleware"));
 
 app.listen(3000, function () {
