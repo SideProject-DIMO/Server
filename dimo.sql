@@ -13,6 +13,7 @@ CREATE TABLE `user` (
   `updated_at_nickname` timestamp NULL DEFAULT NULL,
   `updated_at_mbti` timestamp NULL DEFAULT NULL,
   `intro` varchar(100) DEFAULT NULL,
+  `profile_img` varchar(300) DEFAULT NULL,
   PRIMARY KEY (`user_no`),
   UNIQUE KEY `user_id` (`user_id`),
   UNIQUE KEY `nickname` (`nickname`)
