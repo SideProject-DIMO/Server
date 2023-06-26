@@ -32,10 +32,12 @@ router.get("/", async (req, res, next) => {
 
 // 비밀번호 변경
 router.get("/change_pw", async (req, res, next) => {
+  let result_code = 400;
+  let message = "에러가 발생했습니다.";
   let user_id = req.query.user_id;
   let password = req.query.password; //원래 비밀번호
   let new_password = req.query.new_password; //새로운 비밀번호
-  let password_by = bcrypt.hashSync(password, 10); // sync
+  // let password_by = bcrypt.hashSync(password, 10); // sync
   let new_password_by = bcrypt.hashSync(new_password, 10); // sync
 
   try {
@@ -44,33 +46,32 @@ router.get("/change_pw", async (req, res, next) => {
       [user_id]
     );
 
-    if (!(await bcrypt.compare(password_by, is_pw_dup[0].password))) {
-      resultCode = 401;
+    if (!(await bcrypt.compare(password, is_pw_dup[0].password))) {
+      result_code = 401;
       message_confirm_pw = "기존 비밀번호를 잘못 입력했습니다.";
     } else {
       message_confirm_pw = "";
-    }
+      //select가 undefined 라면
+      if (is_pw_dup[0] == undefined) {
+        result_code = 402;
+        message = "존재하지 않는 아이디입니다.";
+      } //비밀번호 복호화 시, 입력한 값과 동일할 경우
+      else if (await bcrypt.compare(new_password, is_pw_dup[0].password)) {
+        result_code = 402;
+        message = "같은 비밀번호가 입력되었습니다.";
+      } else {
+        result_code = 200;
+        message = "비밀번호가 성공적으로 변경되었습니다.";
+      }
 
-    //select가 undefined 라면
-    if (is_pw_dup[0] == undefined) {
-      resultCode = 402;
-      message = "존재하지 않는 아이디입니다.";
-    } //비밀번호 복호화 시, 입력한 값과 동일할 경우
-    else if (await bcrypt.compare(new_password_by, is_pw_dup[0].password)) {
-      resultCode = 402;
-      message = "같은 비밀번호가 입력되었습니다.";
-    } else {
-      resultCode = 200;
-      message = "비밀번호가 성공적으로 변경되었습니다.";
+      const [change_pw] = await pool.execute(
+        `UPDATE user SET password = ? where user_id = ?`,
+        [new_password_by, user_id]
+      );
     }
-
-    const [change_pw] = await pool.execute(
-      `UPDATE user SET password = ? where user_id = ?`,
-      [new_password_by, user_id]
-    );
 
     return res.json({
-      code: resultCode,
+      code: result_code,
       message: message,
       message_confirm_pw: message_confirm_pw,
       user_id: user_id,
