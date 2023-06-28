@@ -54,22 +54,51 @@ router.post("/mod_profile", async (req, res, next) => {
   }
 });
 
-// 좋아요 누른 콘텐츠 조회하기
-router.get("/like_content", async (req, res, next) => {
+// 좋아요 누른 애니메이션 조회하기
+router.get("/like_anime_content", async (req, res, next) => {
   const {user_id} = req.query;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
     const [my_like_content] = await pool.execute(
-      `SELECT content_type, content_id FROM dimo_like WHERE user_id = ?`,
+      `SELECT content_id FROM dimo_like WHERE user_id = ? and content_type = 'anime'`,
       [user_id]
     );
     if (my_like_content[0] == null) {
       result_code = 201;
-      message = "좋아요 누른 콘텐츠 없음";
+      message = "좋아요 누른 애니메이션 없음";
     } else {
       result_code = 200;
-      message = "좋아요 누른 콘텐츠 조회 성공";
+      message = "좋아요 누른 애니메이션 조회 성공";
+    }
+
+    return res.json({
+      code: result_code,
+      message: message,
+      like_content: my_like_content,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(err);
+  }
+});
+
+// 좋아요 누른 영화 조회하기
+router.get("/like_movie_content", async (req, res, next) => {
+  const {user_id} = req.query;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+  try {
+    const [my_like_content] = await pool.execute(
+      `SELECT content_id FROM dimo_like WHERE user_id = ? and content_type = 'movie'`,
+      [user_id]
+    );
+    if (my_like_content[0] == null) {
+      result_code = 201;
+      message = "좋아요 누른 영화 없음";
+    } else {
+      result_code = 200;
+      message = "좋아요 누른 영화 조회 성공";
     }
 
     return res.json({
