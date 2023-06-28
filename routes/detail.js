@@ -47,6 +47,32 @@ router.post("/dislike", async (req, res, next) => {
   }
 });
 
+// 평점 누르기
+router.post("/grade", async (req, res, next) => {
+  const {user_id, contentId, content_type, grade} = req.body;
+  let result_code = 400;
+  let message = "에러가 발생했습니다.";
+
+  try {
+    const [post_grade] = await pool.execute(
+      `INSERT INTO dimo_grade (grade, user_id, content_id, content_type) VALUES (?, ?, ?, ?)`,
+      [grade, user_id, contentId, content_type]
+    );
+    result_code = 200;
+    message = "평점을 저장했습니다.";
+    return res.json({
+      code: result_code,
+      message: message,
+      user_id: user_id,
+      content_type: content_type,
+      conetentId: contentId,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(err);
+  }
+});
+
 router.get("/animedata/:contentId", async (req, res, next) => {
   try {
     let contentId = req.params.contentId;
@@ -54,8 +80,6 @@ router.get("/animedata/:contentId", async (req, res, next) => {
       `SELECT url_type FROM anime_contents WHERE anime_content_id = ?`,
       [contentId]
     );
-
-    console.log(detail[0].url_type);
 
     let url = "https://anime.onnada.com/";
     if (detail[0].url_type == 0) {
