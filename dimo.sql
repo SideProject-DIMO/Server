@@ -57,3 +57,13 @@ CREATE TABLE `dimo_like` (
   `user_id` varchar(30) NOT NULL,
   PRIMARY KEY (`like_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- 평점
+CREATE TABLE `dimo_grade` (
+  `grade_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(30) NOT NULL,
+  `content_id` int(11) NOT NULL,
+  `content_type` varchar(10) NOT NULL,
+  `grade` int(11) NOT NULL,
+  PRIMARY KEY (`grade_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
