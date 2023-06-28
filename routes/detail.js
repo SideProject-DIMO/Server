@@ -54,12 +54,26 @@ router.post("/grade", async (req, res, next) => {
   let message = "에러가 발생했습니다.";
 
   try {
-    const [post_grade] = await pool.execute(
-      `INSERT INTO dimo_grade (grade, user_id, content_id, content_type) VALUES (?, ?, ?, ?)`,
-      [grade, user_id, contentId, content_type]
+    const [is_grade_dup] = await pool.execute(
+      `SELECT * FROM dimo_grade WHERE user_id = ? and content_id =? and content_type =?`,
+      [user_id, contentId, content_type]
     );
-    result_code = 200;
-    message = "평점을 저장했습니다.";
+
+    if (is_grade_dup[0] == null) {
+      const [post_grade] = await pool.execute(
+        `INSERT INTO dimo_grade (grade, user_id, content_id, content_type) VALUES (?, ?, ?, ?)`,
+        [grade, user_id, contentId, content_type]
+      );
+      result_code = 200;
+      message = "평점을 저장했습니다.";
+    } else {
+      const [mod_grade] = await pool.execute(
+        `UPDATE dimo_grade SET grade =? WHERE user_id=? and content_id=? and content_type=?`,
+        [grade, user_id, contentId, content_type]
+      );
+      result_code = 201;
+      message = "평점을 수정했습니다.";
+    }
     return res.json({
       code: result_code,
       message: message,
