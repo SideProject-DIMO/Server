@@ -2,6 +2,7 @@ const pool = require("../db");
 const express = require("express");
 const router = express.Router();
 
+// 내 프로필 조회하기
 router.get("/", async (req, res, next) => {
   const {user_id} = req.query;
   let result_code = 404;
@@ -30,6 +31,7 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+// 내 프로필 수정하기
 router.post("/mod_profile", async (req, res, next) => {
   const {user_id, profile_img, intro} = req.body;
   let result_code = 404;
@@ -52,6 +54,33 @@ router.post("/mod_profile", async (req, res, next) => {
   }
 });
 
+// 좋아요 누른 콘텐츠 조회하기
+router.get("/like_content", async (req, res, next) => {
+  const {user_id} = req.query;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+  try {
+    const [my_like_content] = await pool.execute(
+      `SELECT content_type, content_id FROM dimo_like WHERE user_id = ?`,
+      [user_id]
+    );
+    if (my_like_content[0] == null) {
+      result_code = 201;
+      message = "좋아요 누른 콘텐츠 없음";
+    } else {
+      result_code = 200;
+      message = "좋아요 누른 콘텐츠 조회 성공";
+    }
 
+    return res.json({
+      code: result_code,
+      message: message,
+      like_content: my_like_content,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(err);
+  }
+});
 
 module.exports = router;
