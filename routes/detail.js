@@ -1,19 +1,19 @@
-const pool = require("../db");
-const puppeteer = require("puppeteer");
-const express = require("express");
+const pool = require('../db');
+const puppeteer = require('puppeteer');
+const express = require('express');
 const router = express.Router();
 
-router.post("/like", async (req, res, next) => {
-  const {user_id, content_type, contentId} = req.body;
+router.post('/like', async (req, res, next) => {
+  const { user_id, content_type, contentId } = req.body;
   let result_code = 404;
-  let message = "에러가 발생했습니다.";
+  let message = '에러가 발생했습니다.';
   try {
     const [like] = await pool.execute(
       `INSERT INTO dimo_like (content_type, content_id, user_id) VALUES (?, ?, ?)`,
       [content_type, contentId, user_id]
     );
     result_code = 200;
-    message = "좋아요를 눌렀습니다.";
+    message = '좋아요를 눌렀습니다.';
     return res.json({
       code: result_code,
       message: message,
@@ -25,17 +25,17 @@ router.post("/like", async (req, res, next) => {
   }
 });
 
-router.post("/dislike", async (req, res, next) => {
-  const {user_id, content_type, contentId} = req.body;
+router.post('/dislike', async (req, res, next) => {
+  const { user_id, content_type, contentId } = req.body;
   let result_code = 404;
-  let message = "에러가 발생했습니다.";
+  let message = '에러가 발생했습니다.';
   try {
     const [dislike] = await pool.execute(
       `DELETE FROM dimo_like WHERE user_id = ? and content_type = ? and content_id = ?`,
       [user_id, content_type, contentId]
     );
     result_code = 200;
-    message = "좋아요를 취소했습니다.";
+    message = '좋아요를 취소했습니다.';
     return res.json({
       code: result_code,
       message: message,
@@ -48,10 +48,10 @@ router.post("/dislike", async (req, res, next) => {
 });
 
 // 평점 누르기
-router.post("/grade", async (req, res, next) => {
-  const {user_id, contentId, content_type, grade} = req.body;
+router.post('/grade', async (req, res, next) => {
+  const { user_id, contentId, content_type, grade } = req.body;
   let result_code = 400;
-  let message = "에러가 발생했습니다.";
+  let message = '에러가 발생했습니다.';
 
   try {
     const [is_grade_dup] = await pool.execute(
@@ -65,14 +65,14 @@ router.post("/grade", async (req, res, next) => {
         [grade, user_id, contentId, content_type]
       );
       result_code = 200;
-      message = "평점을 저장했습니다.";
+      message = '평점을 저장했습니다.';
     } else {
       const [mod_grade] = await pool.execute(
         `UPDATE dimo_grade SET grade =? WHERE user_id=? and content_id=? and content_type=?`,
         [grade, user_id, contentId, content_type]
       );
       result_code = 201;
-      message = "평점을 수정했습니다.";
+      message = '평점을 수정했습니다.';
     }
     return res.json({
       code: result_code,
@@ -87,7 +87,7 @@ router.post("/grade", async (req, res, next) => {
   }
 });
 
-router.get("/animedata/:contentId", async (req, res, next) => {
+router.get('/animedata/:contentId', async (req, res, next) => {
   try {
     let contentId = req.params.contentId;
     let [detail] = await pool.execute(
@@ -95,18 +95,18 @@ router.get("/animedata/:contentId", async (req, res, next) => {
       [contentId]
     );
 
-    let url = "https://anime.onnada.com/";
+    let url = 'https://anime.onnada.com/';
     if (detail[0].url_type == 0) {
-      url += contentId + "/nav/good";
+      url += contentId + '/nav/good';
     } else if (detail[0].url_type == 2) {
-      url += contentId + "/nav/quarter";
+      url += contentId + '/nav/quarter';
     } else {
       url += contentId;
     }
     // 크롤링 시작
     const browser = await puppeteer.launch({
       headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
 
     const results = [];
@@ -114,33 +114,33 @@ router.get("/animedata/:contentId", async (req, res, next) => {
     await page.goto(url.trim());
 
     // 포스터 이미지
-    const posterElement = await page.$(".view-info .image img");
+    const posterElement = await page.$('.view-info .image img');
     const posterImg = await page.evaluate(
-      (element) => element.getAttribute("src"),
+      (element) => element.getAttribute('src'),
       posterElement
     );
 
     // 프로필+캐릭터명, 작품명, 줄거리
-    const grabData = await page.$$eval(".view-chacon li", (items) => {
+    const grabData = await page.$$eval('.view-chacon li', (items) => {
       const data = [];
 
       for (const item of items) {
-        const photoDiv = item.querySelector(".photo");
-        const listDiv = item.querySelector(".list");
-        let characterImg = "";
-        let characterName = "";
+        const photoDiv = item.querySelector('.photo');
+        const listDiv = item.querySelector('.list');
+        let characterImg = '';
+        let characterName = '';
 
         if (photoDiv) {
-          const img = photoDiv.querySelector("img");
+          const img = photoDiv.querySelector('img');
           if (img) {
-            characterImg = img.getAttribute("src");
+            characterImg = img.getAttribute('data-original');
           }
         }
 
         if (listDiv) {
-          const box1 = listDiv.querySelector(".box1");
+          const box1 = listDiv.querySelector('.box1');
           if (box1) {
-            characterName = box1.querySelector(".name").textContent;
+            characterName = box1.querySelector('.name').textContent;
           }
         }
 
@@ -150,11 +150,11 @@ router.get("/animedata/:contentId", async (req, res, next) => {
         });
       }
 
-      const titleTag = document.querySelector(".view-title h1");
-      const title = titleTag ? titleTag.innerHTML : "";
+      const titleTag = document.querySelector('.view-title h1');
+      const title = titleTag ? titleTag.innerHTML : '';
 
-      const plotTag = document.querySelector(".c");
-      const plot = plotTag ? plotTag.innerHTML : "";
+      const plotTag = document.querySelector('.c');
+      const plot = plotTag ? plotTag.innerHTML : '';
 
       return {
         title,
@@ -218,8 +218,8 @@ router.get("/animedata/:contentId", async (req, res, next) => {
 
     res.json(results[0]);
   } catch (error) {
-    console.error("Error during crawling:", error);
-    res.status(500).send("Error during crawling");
+    console.error('Error during crawling:', error);
+    res.status(500).send('Error during crawling');
   }
 });
 
