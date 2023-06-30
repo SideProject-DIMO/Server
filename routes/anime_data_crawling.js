@@ -79,7 +79,7 @@ router.get("/animedata", async (req, res) => {
         const genreElement = await page.$x(
           '//span[starts-with(text(), "장르")]/following-sibling::span[1]'
         );
-        const genre = await page.evaluate(
+        let genre = await page.evaluate(
           (element) => element.textContent,
           genreElement[0]
         );
@@ -88,7 +88,7 @@ router.get("/animedata", async (req, res) => {
         const directorElement = await page.$x(
           '//span[starts-with(text(), "감독")]/following-sibling::span[1]'
         );
-        const director = await page.evaluate(
+        let director = await page.evaluate(
           (element) => element.textContent,
           directorElement[0]
         );
@@ -97,7 +97,7 @@ router.get("/animedata", async (req, res) => {
         const releaseElement = await page.$x(
           '//span[starts-with(text(), "방영일")]/following-sibling::span[1]'
         );
-        const release = await page.evaluate(
+        let release = await page.evaluate(
           (element) => element.textContent,
           releaseElement[0]
         );
@@ -106,18 +106,18 @@ router.get("/animedata", async (req, res) => {
         const rateElement = await page.$x(
           '//span[starts-with(text(), "등급")]/following-sibling::span[1]'
         );
-        const rate = await page.evaluate(
+        let rate = await page.evaluate(
           (element) => element.textContent,
           rateElement[0]
         );
 
-        //콘텐츠 업데이트 시, 사용
-        let url_type = 2;
-        if (url.indexOf("good") != -1) {
-          url_type = 0;
-        } else if (url.indexOf("quarter") != -1) {
-          url_type = 1;
-        }
+        // //콘텐츠 업데이트 시, 사용
+        // let url_type = 2;
+        // if (url.indexOf("good") != -1) {
+        //   url_type = 0;
+        // } else if (url.indexOf("quarter") != -1) {
+        //   url_type = 1;
+        // }
 
         // const [check_anime_data] = await pool.execute(
         //   `SELECT anime_content_id FROM anime_contents WHERE anime_content_id = ? `,
@@ -125,11 +125,53 @@ router.get("/animedata", async (req, res) => {
         // );
 
         // if (check_anime_data[0] == null) {
-        //   const [save_anime_data] = await pool.execute(
-        //     `INSERT INTO anime_contents (anime_content_id, url_type) VALUES (?, ?)`,
-        //     [contentId, url_type]
-        //   );
+        // const [save_anime_data] = await pool.execute(
+        //   `INSERT INTO anime_contents (anime_content_id, url_type) VALUES (?, ?)`,
+        //   [contentId, url_type]
+        // );
         // }
+
+        console.log(grabData.items.length);
+
+        async (_) => {
+          for (let i; i < grabData.items.length; i++) {
+            let [character_save] = await pool.execute(
+              `INSERT INTO anime_character (anime_id, character_img, character_name) VALUES (?, ?, ?)`,
+              [
+                contentId,
+                grabData.items[i].characterImg,
+                grabData.items[i].data.characterName,
+              ]
+            );
+          }
+        };
+
+        // if (grabData.genre == undefined) {
+        //   grabData.genre = null;
+        // }
+        // if (director == undefined) {
+        //   director = null;
+        // }
+        // if (release == undefined) {
+        //   release = null;
+        // }
+        // if (rate == undefined) {
+        //   rate = null;
+        // }
+
+        const [save_anime_data] = await pool.execute(
+          `INSERT INTO anime_contents VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            contentId,
+            grabData.title,
+            genre,
+            grabData.plot,
+            posterImg,
+            director,
+            release,
+            rate,
+          ]
+        );
 
         results.push({
           contentId: contentId,
