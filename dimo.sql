@@ -17,7 +17,7 @@ CREATE TABLE `user` (
   PRIMARY KEY (`user_no`),
   UNIQUE KEY `user_id` (`user_id`),
   UNIQUE KEY `nickname` (`nickname`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- 인증번호
 CREATE TABLE `sms_validation` (
@@ -77,4 +77,14 @@ CREATE TABLE `dimo_like` (
   `content_id` int(11) NOT NULL,
   `user_id` varchar(30) NOT NULL,
   PRIMARY KEY (`like_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- 평점
+CREATE TABLE `dimo_grade` (
+  `grade_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(30) NOT NULL,
+  `content_id` int(11) NOT NULL,
+  `content_type` varchar(10) NOT NULL,
+  `grade` float NOT NULL,
+  PRIMARY KEY (`grade_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
