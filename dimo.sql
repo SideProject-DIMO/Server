@@ -29,8 +29,15 @@ CREATE TABLE `sms_validation` (
 
 -- 콘텐츠 영화 
 CREATE TABLE `movie_contents` (
-  `movie_id` int NOT NULL AUTO_INCREMENT,
-  `movie_content_id` int DEFAULT NULL,
+  `movie_id` int(11) NOT NULL,
+  `title` varchar(50) DEFAULT NULL,
+  `genre` varchar(50) DEFAULT NULL,
+  `running_time` varchar(10) DEFAULT NULL,
+  `plot` varchar(500) DEFAULT NULL,
+  `poster_img` varchar(100) DEFAULT NULL,
+  `rate` float DEFAULT NULL,
+  `director` varchar(10) DEFAULT NULL,
+  `release` varchar(40) DEFAULT NULL,
   PRIMARY KEY (`movie_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -43,9 +50,23 @@ CREATE TABLE `drop_reason` (
 
 -- 콘텐츠 애니메이션 
 CREATE TABLE `anime_contents` (
-  `anime_id` int NOT NULL AUTO_INCREMENT,
-  `anime_content_id` int DEFAULT NULL,
-  `url_type` int NOT NULL, -- type 0이면 /nav/good, 1이면 /nav/quarter, 2면 /
+  `anime_id` int(11) NOT NULL,
+  `title` varchar(50) DEFAULT NULL,
+  `genre` varchar(80) DEFAULT NULL,
+  `plot` varchar(800) DEFAULT NULL,
+  `poster_img` varchar(300) DEFAULT NULL,
+  `director` varchar(40) DEFAULT NULL,
+  `release` varchar(40) DEFAULT NULL,
+  `rate` float DEFAULT NULL,
+  PRIMARY KEY (`anime_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- 애니메이션 캐릭터
+CREATE TABLE `anime_character` (
+  `anime_id` int(11) NOT NULL,
+  `character_img` varchar(100) DEFAULT NULL,
+  `character_name` varchar(30) DEFAULT NULL,
+  `character_mbti` varchar(5) DEFAULT NULL,
   PRIMARY KEY (`anime_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
