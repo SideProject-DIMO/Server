@@ -88,3 +88,23 @@ CREATE TABLE `dimo_grade` (
   `grade` float NOT NULL,
   PRIMARY KEY (`grade_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- 평점 평균
+CREATE TABLE `dimo_grade_avg` (
+  `entj` float DEFAULT NULL,
+  `intj` float DEFAULT NULL,
+  `estj` float DEFAULT NULL,
+  `istj` float DEFAULT NULL,
+  `enfj` float DEFAULT NULL,
+  `infj` float DEFAULT NULL,
+  `esfj` float DEFAULT NULL,
+  `isfj` float DEFAULT NULL,
+  `entp` float DEFAULT NULL,
+  `intp` float DEFAULT NULL,
+  `estp` float DEFAULT NULL,
+  `istp` float DEFAULT NULL,
+  `esfp` float DEFAULT NULL,
+  `isfp` float DEFAULT NULL,
+  `enfp` float DEFAULT NULL,
+  `infp` float DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
