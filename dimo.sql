@@ -91,6 +91,7 @@ CREATE TABLE `dimo_grade` (
 
 -- 평점 평균
 CREATE TABLE `dimo_grade_avg` (
+  `content_id` int(11) NOT NULL,
   `entj` float DEFAULT NULL,
   `intj` float DEFAULT NULL,
   `estj` float DEFAULT NULL,
@@ -106,5 +107,6 @@ CREATE TABLE `dimo_grade_avg` (
   `esfp` float DEFAULT NULL,
   `isfp` float DEFAULT NULL,
   `enfp` float DEFAULT NULL,
-  `infp` float DEFAULT NULL
+  `infp` float DEFAULT NULL,
+  PRIMARY KEY (`content_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

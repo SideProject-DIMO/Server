@@ -122,7 +122,7 @@ router.get("/confirm_nickname_modify", async (req, res, next) => {
     // 한달 = 2592000000밀리초
 
     if (
-      nick_mod_time[0].updated_at_nickname != null &&
+      nick_mod_time[0] != null &&
       now.getTime() - nick_mod_time[0].updated_at_nickname.getTime() <
         2592000000
     ) {
@@ -182,7 +182,7 @@ router.get("/confirm_mbti_modify", async (req, res, next) => {
     let now = new Date();
 
     if (
-      confirm_mbti[0].updated_at_mbti != null &&
+      confirm_mbti[0] != null &&
       now.getTime() - confirm_mbti[0].updated_at_mbti.getTime() < 2592000000
     ) {
       resultCode = 401;
