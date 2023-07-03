@@ -172,11 +172,13 @@ router.get("/animedata/:contentId", async (req, res, next) => {
     const grabData = await page.$$eval(".view-chacon li", (items) => {
       const data = [];
 
-      for (const item of items) {
-        const photoDiv = item.querySelector(".photo");
-        const listDiv = item.querySelector(".list");
-        let characterImg = "";
-        let characterName = "";
+      //캐릭터 정보 최대 20명까지만
+      for (let i = 0; i < Math.min(items.length, 20); i++) {
+        const item = items[i];
+        const photoDiv = item.querySelector('.photo');
+        const listDiv = item.querySelector('.list');
+        let characterImg = '';
+        let characterName = '';
 
         if (photoDiv) {
           const img = photoDiv.querySelector("img");
