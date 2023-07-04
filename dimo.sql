@@ -65,8 +65,8 @@ CREATE TABLE `anime_contents` (
 CREATE TABLE `anime_character` (
   `character_id` int(11) NOT NULL AUTO_INCREMENT,
   `anime_id` int(11) NOT NULL,
-  `character_img` varchar(100) DEFAULT NULL,
-  `character_name` varchar(30) DEFAULT NULL,
+  `character_img` varchar(300) DEFAULT NULL,
+  `character_name` varchar(100) DEFAULT NULL,
   `character_mbti` varchar(5) DEFAULT NULL,
   PRIMARY KEY (`character_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
