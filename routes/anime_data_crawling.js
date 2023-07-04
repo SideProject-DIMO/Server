@@ -1,60 +1,60 @@
-const pool = require('../db');
-const puppeteer = require('puppeteer');
-const express = require('express');
+const pool = require("../db");
+const puppeteer = require("puppeteer");
+const express = require("express");
 const router = express.Router();
-const readline = require('readline');
-const fs = require('fs');
+const readline = require("readline");
+const fs = require("fs");
 
-router.get('/animedata', async (req, res) => {
+router.get("/animedata", async (req, res) => {
   try {
     // 크롤링 시작
     const browser = await puppeteer.launch({
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
 
     //urls.txt 크롤링 순환
-    const urls = fs.readFileSync('urls.txt', 'utf-8').split('\n');
+    const urls = fs.readFileSync("urls.txt", "utf-8").split("\n");
 
     const results = [];
     for (let url of urls) {
-      if (url.trim() !== '') {
+      if (url.trim() !== "") {
         const page = await browser.newPage();
         await page.goto(url.trim());
 
         // 콘텐츠 고유번호 추출
         const contentId = url.match(/\.com\/(\d+)/)[1];
 
-        // 포스터 이미지
-        const posterElement = await page.$('.view-info .image img');
-        const posterImg = await page.evaluate(
-          (element) => element.getAttribute('src'),
-          posterElement
-        );
+        // // 포스터 이미지
+        // const posterElement = await page.$(".view-info .image img");
+        // const posterImg = await page.evaluate(
+        //   (element) => element.getAttribute("src"),
+        //   posterElement
+        // );
 
         // 프로필+캐릭터명, 작품명, 줄거리
-        const grabData = await page.$$eval('.view-chacon li', (items) => {
+        const grabData = await page.$$eval(".view-chacon li", (items) => {
           const data = [];
 
           //캐릭터 정보 최대 20명까지만
           for (let i = 0; i < Math.min(items.length, 20); i++) {
             const item = items[i];
-            const photoDiv = item.querySelector('.photo');
-            const listDiv = item.querySelector('.list');
-            let characterImg = '';
-            let characterName = '';
+            const photoDiv = item.querySelector(".photo");
+            const listDiv = item.querySelector(".list");
+            let characterImg = "";
+            let characterName = "";
 
             if (photoDiv) {
-              const img = photoDiv.querySelector('img');
+              const img = photoDiv.querySelector("img");
               if (img) {
-                characterImg = img.getAttribute('data-original');
+                characterImg = img.getAttribute("data-original");
               }
             }
 
             if (listDiv) {
-              const box1 = listDiv.querySelector('.box1');
+              const box1 = listDiv.querySelector(".box1");
               if (box1) {
-                characterName = box1.querySelector('.name').textContent;
+                characterName = box1.querySelector(".name").textContent;
               }
             }
 
@@ -64,11 +64,11 @@ router.get('/animedata', async (req, res) => {
             });
           }
 
-          const titleTag = document.querySelector('.view-title h1');
-          const title = titleTag ? titleTag.innerHTML : '';
+          const titleTag = document.querySelector(".view-title h1");
+          const title = titleTag ? titleTag.innerHTML : "";
 
-          const plotTag = document.querySelector('.c');
-          const plot = plotTag ? plotTag.innerHTML : '';
+          const plotTag = document.querySelector(".c");
+          const plot = plotTag ? plotTag.innerHTML : "";
 
           return {
             title,
@@ -77,41 +77,41 @@ router.get('/animedata', async (req, res) => {
           };
         });
 
-        // 장르
-        const genreElement = await page.$x(
-          '//span[starts-with(text(), "장르")]/following-sibling::span[1]'
-        );
-        let genre = await page.evaluate(
-          (element) => element.textContent,
-          genreElement[0]
-        );
+        // // 장르
+        // const genreElement = await page.$x(
+        //   '//span[starts-with(text(), "장르")]/following-sibling::span[1]'
+        // );
+        // let genre = await page.evaluate(
+        //   (element) => element.textContent,
+        //   genreElement[0]
+        // );
 
-        // 감독
-        const directorElement = await page.$x(
-          '//span[starts-with(text(), "감독")]/following-sibling::span[1]'
-        );
-        let director = await page.evaluate(
-          (element) => element.textContent,
-          directorElement[0]
-        );
+        // // 감독
+        // const directorElement = await page.$x(
+        //   '//span[starts-with(text(), "감독")]/following-sibling::span[1]'
+        // );
+        // let director = await page.evaluate(
+        //   (element) => element.textContent,
+        //   directorElement[0]
+        // );
 
-        // 방영일
-        const releaseElement = await page.$x(
-          '//span[starts-with(text(), "방영일")]/following-sibling::span[1]'
-        );
-        let release = await page.evaluate(
-          (element) => element.textContent,
-          releaseElement[0]
-        );
+        // // 방영일
+        // const releaseElement = await page.$x(
+        //   '//span[starts-with(text(), "방영일")]/following-sibling::span[1]'
+        // );
+        // let release = await page.evaluate(
+        //   (element) => element.textContent,
+        //   releaseElement[0]
+        // );
 
-        // 등급
-        const rateElement = await page.$x(
-          '//span[starts-with(text(), "등급")]/following-sibling::span[1]'
-        );
-        let rate = await page.evaluate(
-          (element) => element.textContent,
-          rateElement[0]
-        );
+        // // 등급
+        // const rateElement = await page.$x(
+        //   '//span[starts-with(text(), "등급")]/following-sibling::span[1]'
+        // );
+        // let rate = await page.evaluate(
+        //   (element) => element.textContent,
+        //   rateElement[0]
+        // );
 
         // //콘텐츠 업데이트 시, 사용
         // let url_type = 2;
@@ -133,20 +133,38 @@ router.get('/animedata', async (req, res) => {
         // );
         // }
 
-        console.log(grabData.items.length);
-
-        async (_) => {
-          for (let i; i < grabData.items.length; i++) {
-            let [character_save] = await pool.execute(
+        async function saveData() {
+          // for (let i; i < grabData.items.length; i++) {
+          let i = 0;
+          while (true) {
+            await pool.execute(
               `INSERT INTO anime_character (anime_id, character_img, character_name) VALUES (?, ?, ?)`,
               [
                 contentId,
                 grabData.items[i].characterImg,
-                grabData.items[i].data.characterName,
+                grabData.items[i].characterName,
               ]
             );
+            i++;
+            if (i == grabData.items.length - 1) {
+              break;
+            }
           }
-        };
+        }
+
+        saveData();
+
+        // for (let i; i < grabData.items.length; i++) {
+        //   console.log("들어가나");
+        //   await pool.execute(
+        //     `INSERT INTO anime_character (anime_id, character_img, character_name) VALUES (?, ?, ?)`,
+        //     [
+        //       contentId,
+        //       grabData.items[i].characterImg,
+        //       grabData.items[i].characterName,
+        //     ]
+        //   );
+        // }
 
         // if (grabData.genre == undefined) {
         //   grabData.genre = null;
@@ -161,31 +179,31 @@ router.get('/animedata', async (req, res) => {
         //   rate = null;
         // }
 
-        const [save_anime_data] = await pool.execute(
-          `INSERT INTO anime_contents VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-          [
-            contentId,
-            grabData.title,
-            genre,
-            grabData.plot,
-            posterImg,
-            director,
-            release,
-            rate,
-          ]
-        );
+        // const [save_anime_data] = await pool.execute(
+        //   `INSERT INTO anime_contents VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        //   [
+        //     contentId,
+        //     grabData.title,
+        //     genre,
+        //     grabData.plot,
+        //     posterImg,
+        //     director,
+        //     release,
+        //     rate,
+        //   ]
+        // );
 
-        results.push({
-          contentId: contentId,
-          poster: posterImg,
-          title: grabData.title,
-          plot: grabData.plot,
-          genre: genre,
-          director: director,
-          release: release,
-          rate: rate,
-          characters: grabData.items,
-        });
+        // results.push({
+        //   contentId: contentId,
+        //   poster: posterImg,
+        //   title: grabData.title,
+        //   plot: grabData.plot,
+        //   genre: genre,
+        //   director: director,
+        //   release: release,
+        //   rate: rate,
+        //   characters: grabData.items,
+        // });
 
         await page.close();
       }
@@ -196,8 +214,8 @@ router.get('/animedata', async (req, res) => {
 
     res.json(results);
   } catch (error) {
-    console.error('Error during crawling:', error);
-    res.status(500).send('Error during crawling');
+    console.error("Error during crawling:", error);
+    res.status(500).send("Error during crawling");
   }
 });
 
