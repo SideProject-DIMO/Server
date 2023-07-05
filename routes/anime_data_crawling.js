@@ -145,10 +145,10 @@ router.get("/animedata", async (req, res) => {
                 grabData.items[i].characterName,
               ]
             );
-            i++;
-            if (i == grabData.items.length - 1) {
+            if (i == grabData.items.length - 1 || i == 19) {
               break;
             }
+            i++;
           }
         }
 
