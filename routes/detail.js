@@ -87,26 +87,26 @@ router.post("/grade", async (req, res, next) => {
       [contentId, content_type, my_mbti[0].mbti]
     );
 
-    if (is_exist_grade[0] != null) {
-      await pool.execute(
+      if (is_exist_grade[0] != null) {
+        await pool.execute(
         `UPDATE dimo_grade_avg SET mbti_grade_avg = ? and avg_people = ? WHERE content_id = ? and content_type = ? and mbti = ?`,
-        [
+          [
           is_exist_grade[0].mbti_grade_avg + grade,
-          is_exist_grade[0].avg_people + 1,
-          contentId,
-          content_type,
-          my_mbti[0].mbti,
-        ]
-      );
-      grade_message = "평점 평균을 업데이트 했습니다.";
-    } else {
-      await pool.execute(
+            is_exist_grade[0].avg_people + 1,
+            contentId,
+            content_type,
+            my_mbti[0].mbti,
+          ]
+        );
+        grade_message = "평점 평균을 업데이트 했습니다.";
+      } else {
+        await pool.execute(
         `INSERT INTO dimo_grade_avg (content_id, mbti, mbti_grade_avg, avg_people, content_type) VALUES (?, ?, ?, ?, ?)`,
         [conetentId, my_mbti[0].mbti, grade, 1, content_type]
-      );
-      grade_message = "평점 평균을 추가했습니다.";
-    }
-    grade_result_code = 200;
+        );
+        grade_message = "평점 평균을 추가했습니다.";
+      }
+      grade_result_code = 200;
 
     return res.json({
       code: result_code,
@@ -124,152 +124,65 @@ router.post("/grade", async (req, res, next) => {
 // mbti별 평점 TOP3 조회하기
 router.get("/mbti_grade", async (req, res, next) => {
   const {contentId, content_type} = req.query;
+  let result_code = 400;
+  let message = "에러가 발생했습니다.";
   try {
     const [mbti_grade] = await pool.execute(
-      `SELECT * FROM dimo_grade_avg WHERE content_id = ? and content_type = ? ORDER BY entj DESC, intj DESC, estj DESC, istj DESC, enfj DESC, infj DESC, esfj DESC, isfj DESC, entp DESC, intp DESC, estp DESC, istp DESC, esfp DESC, isfp DESC, enfp DESC, infp DESC LIMIT 3`,
+      `SELECT * FROM dimo_grade_avg WHERE content_id = ? and content_type = ? ORDER BY mbti_grade_avg DESC LIMIT 3`,
       [contentId, content_type]
     );
+
+    result_code = 200;
+    message = "TOP3 mbti 평점을 성공적으로 조회했습니다.";
+
+    return res.json({
+      code: result_code,
+      message: message,
+      user_id: user_id,
+      mbti_grade: mbti_grade,
+      content_type: content_type,
+      conetentId: contentId,
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json(err);
   }
 });
 
+// 상세 조회
 router.get("/animedata/:contentId", async (req, res, next) => {
+  const contentId = req.params.contentId;
+  let result_code = 400;
+  let message = "에러가 발생했습니다.";
   try {
-    let contentId = req.params.contentId;
     let [detail] = await pool.execute(
-      `SELECT url_type FROM anime_contents WHERE anime_content_id = ?`,
+      `SELECT * FROM anime_contents WHERE anime_id = ?`,
       [contentId]
     );
 
-    let url = "https://anime.onnada.com/";
-    if (detail[0].url_type == 0) {
-      url += contentId + "/nav/good";
-    } else if (detail[0].url_type == 2) {
-      url += contentId + "/nav/quarter";
-    } else {
-      url += contentId;
-    }
-    // 크롤링 시작
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    let [character_detail] = await pool.execute(
+      `SELECT character_id, character_name, character_img, character_mbti from anime_character WHERE anime_id = ?`,
+      [contentId]
+    );
+
+    result_code = 200;
+    message = contentId + "번 애니메이션 조회에 성공했습니다.";
+    return res.json({
+      code: result_code,
+      message: message,
+      conetentId: contentId,
+      title: detail[0].title,
+      genre: detail[0].genre,
+      plot: detail[0].plot,
+      poster_img: detail[0].poster_img,
+      director: detail[0].director,
+      release: detail[0].release,
+      rate: detail[0].rate,
+      characters: character_detail,
     });
-
-    const results = [];
-    const page = await browser.newPage();
-    await page.goto(url.trim());
-
-    // 포스터 이미지
-    const posterElement = await page.$(".view-info .image img");
-    const posterImg = await page.evaluate(
-      (element) => element.getAttribute("src"),
-      posterElement
-    );
-
-    // 프로필+캐릭터명, 작품명, 줄거리
-    const grabData = await page.$$eval(".view-chacon li", (items) => {
-      const data = [];
-
-      //캐릭터 정보 최대 20명까지만
-      for (let i = 0; i < Math.min(items.length, 20); i++) {
-        const item = items[i];
-        const photoDiv = item.querySelector('.photo');
-        const listDiv = item.querySelector('.list');
-        let characterImg = '';
-        let characterName = '';
-
-        if (photoDiv) {
-          const img = photoDiv.querySelector("img");
-          if (img) {
-            characterImg = img.getAttribute("data-original");
-          }
-        }
-
-        if (listDiv) {
-          const box1 = listDiv.querySelector(".box1");
-          if (box1) {
-            characterName = box1.querySelector(".name").textContent;
-          }
-        }
-
-        data.push({
-          characterImg,
-          characterName,
-        });
-      }
-
-      const titleTag = document.querySelector(".view-title h1");
-      const title = titleTag ? titleTag.innerHTML : "";
-
-      const plotTag = document.querySelector(".c");
-      const plot = plotTag ? plotTag.innerHTML : "";
-
-      return {
-        title,
-        plot,
-        items: data,
-      };
-    });
-
-    // 장르
-    const genreElement = await page.$x(
-      '//span[starts-with(text(), "장르")]/following-sibling::span[1]'
-    );
-    const genre = await page.evaluate(
-      (element) => element.textContent,
-      genreElement[0]
-    );
-
-    // 감독
-    const directorElement = await page.$x(
-      '//span[starts-with(text(), "감독")]/following-sibling::span[1]'
-    );
-    const director = await page.evaluate(
-      (element) => element.textContent,
-      directorElement[0]
-    );
-
-    // 방영일
-    const releaseElement = await page.$x(
-      '//span[starts-with(text(), "방영일")]/following-sibling::span[1]'
-    );
-    const release = await page.evaluate(
-      (element) => element.textContent,
-      releaseElement[0]
-    );
-
-    // 등급
-    const rateElement = await page.$x(
-      '//span[starts-with(text(), "등급")]/following-sibling::span[1]'
-    );
-    const rate = await page.evaluate(
-      (element) => element.textContent,
-      rateElement[0]
-    );
-
-    results.push({
-      contentId: contentId,
-      poster: posterImg,
-      title: grabData.title,
-      plot: grabData.plot,
-      genre: genre,
-      director: director,
-      release: release,
-      rate: rate,
-      characters: grabData.items,
-    });
-
-    await page.close();
-
-    await browser.close();
-    // 크롤링 종료
-
-    res.json(results[0]);
   } catch (error) {
-    console.error("Error during crawling:", error);
-    res.status(500).send("Error during crawling");
+    console.error(error);
+    return res.status(500).json(error);
   }
 });
 

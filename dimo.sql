@@ -97,5 +97,6 @@ CREATE TABLE `dimo_grade_avg` (
   `mbti_grade_avg` float DEFAULT NULL,
   `content_type` varchar(10) NOT NULL,
   `avg_people` int(11) DEFAULT '0',
+  `mbti_grade_sum` float DEFAULT NULL,
   PRIMARY KEY (`content_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
