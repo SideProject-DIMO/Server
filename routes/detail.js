@@ -124,11 +124,25 @@ router.post("/grade", async (req, res, next) => {
 // mbti별 평점 TOP3 조회하기
 router.get("/mbti_grade", async (req, res, next) => {
   const {contentId, content_type} = req.query;
+  let result_code = 400;
+  let message = "에러가 발생했습니다.";
   try {
     const [mbti_grade] = await pool.execute(
-      `SELECT * FROM dimo_grade_avg WHERE content_id = ? and content_type = ? ORDER BY entj DESC, intj DESC, estj DESC, istj DESC, enfj DESC, infj DESC, esfj DESC, isfj DESC, entp DESC, intp DESC, estp DESC, istp DESC, esfp DESC, isfp DESC, enfp DESC, infp DESC LIMIT 3`,
+      `SELECT * FROM dimo_grade_avg WHERE content_id = ? and content_type = ? ORDER BY mbti_grade_avg DESC LIMIT 3`,
       [contentId, content_type]
     );
+
+    result_code = 200;
+    message = "TOP3 mbti 평점을 성공적으로 조회했습니다.";
+
+    return res.json({
+      code: result_code,
+      message: message,
+      user_id: user_id,
+      mbti_grade: mbti_grade,
+      content_type: content_type,
+      conetentId: contentId,
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json(err);
