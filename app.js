@@ -24,6 +24,9 @@ app.use("/user_info", require("./routes/change_user_info"));
 //크롤링
 app.use("/crawling", require("./routes/anime_data_crawling.js"));
 
+//홈 조회
+app.use("/home", require("./routes/home.js"));
+
 //상세 조회
 app.use("/detail", require("./routes/detail.js"));
 
