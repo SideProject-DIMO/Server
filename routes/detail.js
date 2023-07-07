@@ -1,19 +1,19 @@
-const pool = require("../db");
-const puppeteer = require("puppeteer");
-const express = require("express");
+const pool = require('../db');
+const puppeteer = require('puppeteer');
+const express = require('express');
 const router = express.Router();
 
-router.post("/like", async (req, res, next) => {
-  const {user_id, content_type, contentId} = req.body;
+router.post('/like', async (req, res, next) => {
+  const { user_id, content_type, contentId } = req.body;
   let result_code = 404;
-  let message = "에러가 발생했습니다.";
+  let message = '에러가 발생했습니다.';
   try {
     const [like] = await pool.execute(
       `INSERT INTO dimo_like (content_type, content_id, user_id) VALUES (?, ?, ?)`,
       [content_type, contentId, user_id]
     );
     result_code = 200;
-    message = "좋아요를 눌렀습니다.";
+    message = '좋아요를 눌렀습니다.';
     return res.json({
       code: result_code,
       message: message,
@@ -25,17 +25,17 @@ router.post("/like", async (req, res, next) => {
   }
 });
 
-router.post("/dislike", async (req, res, next) => {
-  const {user_id, content_type, contentId} = req.body;
+router.post('/dislike', async (req, res, next) => {
+  const { user_id, content_type, contentId } = req.body;
   let result_code = 404;
-  let message = "에러가 발생했습니다.";
+  let message = '에러가 발생했습니다.';
   try {
     const [dislike] = await pool.execute(
       `DELETE FROM dimo_like WHERE user_id = ? and content_type = ? and content_id = ?`,
       [user_id, content_type, contentId]
     );
     result_code = 200;
-    message = "좋아요를 취소했습니다.";
+    message = '좋아요를 취소했습니다.';
     return res.json({
       code: result_code,
       message: message,
@@ -48,12 +48,12 @@ router.post("/dislike", async (req, res, next) => {
 });
 
 // 평점 누르기
-router.post("/grade", async (req, res, next) => {
-  const {user_id, contentId, content_type, grade} = req.body;
+router.post('/grade', async (req, res, next) => {
+  const { user_id, contentId, content_type, grade } = req.body;
   let result_code = 400;
-  let message = "평점을 저장하는데 에러가 발생했습니다.";
+  let message = '평점을 저장하는데 에러가 발생했습니다.';
   let grade_result_code = 400;
-  let grade_message = "평점 평균을 저장하는데 에러가 발생했습니다.";
+  let grade_message = '평점 평균을 저장하는데 에러가 발생했습니다.';
 
   try {
     const [my_mbti] = await pool.execute(
@@ -72,14 +72,14 @@ router.post("/grade", async (req, res, next) => {
         [grade, user_id, contentId, content_type]
       );
       result_code = 200;
-      message = "평점을 저장했습니다.";
+      message = '평점을 저장했습니다.';
     } else {
       const [mod_grade] = await pool.execute(
         `UPDATE dimo_grade SET grade =? WHERE user_id = ? and content_id = ? and content_type = ?`,
         [grade, user_id, contentId, content_type]
       );
       result_code = 201;
-      message = "평점을 수정했습니다.";
+      message = '평점을 수정했습니다.';
     }
 
     let [is_exist_grade] = await pool.execute(
@@ -87,33 +87,33 @@ router.post("/grade", async (req, res, next) => {
       [contentId, content_type, my_mbti[0].mbti]
     );
 
-      if (is_exist_grade[0] != null) {
-        await pool.execute(
+    if (is_exist_grade[0] != null) {
+      await pool.execute(
         `UPDATE dimo_grade_avg SET mbti_grade_avg = ? and avg_people = ? WHERE content_id = ? and content_type = ? and mbti = ?`,
-          [
+        [
           is_exist_grade[0].mbti_grade_avg + grade,
-            is_exist_grade[0].avg_people + 1,
-            contentId,
-            content_type,
-            my_mbti[0].mbti,
-          ]
-        );
-        grade_message = "평점 평균을 업데이트 했습니다.";
-      } else {
-        await pool.execute(
+          is_exist_grade[0].avg_people + 1,
+          contentId,
+          content_type,
+          my_mbti[0].mbti,
+        ]
+      );
+      grade_message = '평점 평균을 업데이트 했습니다.';
+    } else {
+      await pool.execute(
         `INSERT INTO dimo_grade_avg (content_id, mbti, mbti_grade_avg, avg_people, content_type) VALUES (?, ?, ?, ?, ?)`,
-        [conetentId, my_mbti[0].mbti, grade, 1, content_type]
-        );
-        grade_message = "평점 평균을 추가했습니다.";
-      }
-      grade_result_code = 200;
+        [contentId, my_mbti[0].mbti, grade, 1, content_type]
+      );
+      grade_message = '평점 평균을 추가했습니다.';
+    }
+    grade_result_code = 200;
 
     return res.json({
       code: result_code,
       message: message,
       user_id: user_id,
       content_type: content_type,
-      conetentId: contentId,
+      contentId: contentId,
     });
   } catch (err) {
     console.error(err);
@@ -122,10 +122,10 @@ router.post("/grade", async (req, res, next) => {
 });
 
 // mbti별 평점 TOP3 조회하기
-router.get("/mbti_grade", async (req, res, next) => {
-  const {contentId, content_type} = req.query;
+router.get('/mbti_grade', async (req, res, next) => {
+  const { contentId, content_type } = req.query;
   let result_code = 400;
-  let message = "에러가 발생했습니다.";
+  let message = '에러가 발생했습니다.';
   try {
     const [mbti_grade] = await pool.execute(
       `SELECT * FROM dimo_grade_avg WHERE content_id = ? and content_type = ? ORDER BY mbti_grade_avg DESC LIMIT 3`,
@@ -133,7 +133,7 @@ router.get("/mbti_grade", async (req, res, next) => {
     );
 
     result_code = 200;
-    message = "TOP3 mbti 평점을 성공적으로 조회했습니다.";
+    message = 'TOP3 mbti 평점을 성공적으로 조회했습니다.';
 
     return res.json({
       code: result_code,
@@ -141,7 +141,7 @@ router.get("/mbti_grade", async (req, res, next) => {
       user_id: user_id,
       mbti_grade: mbti_grade,
       content_type: content_type,
-      conetentId: contentId,
+      contentId: contentId,
     });
   } catch (err) {
     console.error(err);
@@ -150,10 +150,10 @@ router.get("/mbti_grade", async (req, res, next) => {
 });
 
 // 상세 조회
-router.get("/animedata/:contentId", async (req, res, next) => {
+router.get('/animedata/:contentId', async (req, res, next) => {
   const contentId = req.params.contentId;
   let result_code = 400;
-  let message = "에러가 발생했습니다.";
+  let message = '에러가 발생했습니다.';
   try {
     let [detail] = await pool.execute(
       `SELECT * FROM anime_contents WHERE anime_id = ?`,
@@ -166,11 +166,11 @@ router.get("/animedata/:contentId", async (req, res, next) => {
     );
 
     result_code = 200;
-    message = contentId + "번 애니메이션 조회에 성공했습니다.";
+    message = contentId + '번 애니메이션 조회에 성공했습니다.';
     return res.json({
       code: result_code,
       message: message,
-      conetentId: contentId,
+      contentId: contentId,
       title: detail[0].title,
       genre: detail[0].genre,
       plot: detail[0].plot,
