@@ -215,8 +215,8 @@ router.get("/change_mbti", async (req, res, next) => {
     let now = new Date();
 
     if (
-      (confirm_mbti[0] != null) &
-      (confirm_mbti[0].mbti.toUpperCase() == mbti.toUpperCase())
+      confirm_mbti[0] != null ||
+      confirm_mbti[0].mbti.toUpperCase() == mbti.toUpperCase()
     ) {
       resultCode = 401;
       message = "바꾸려는 mbti가 동일합니다.";
