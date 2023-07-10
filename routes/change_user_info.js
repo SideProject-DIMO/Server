@@ -121,16 +121,16 @@ router.get("/confirm_nickname_modify", async (req, res, next) => {
     let now = new Date();
     // 한달 = 2592000000밀리초
 
-    if (nick_mod_time[0] == null) {
-      resultCode = 200;
-      message = "닉네임을 변경할 수 있습니다.";
-    } else if (
-      nick_mod_time[0] != null &&
+    if (
+      nick_mod_time[0].updated_at_nickname != null &&
       now.getTime() - nick_mod_time[0].updated_at_nickname.getTime() <
         2592000000
     ) {
       resultCode = 401;
       message = "닉네임은 한 달에 한 번만 변경할 수 있습니다.";
+    } else {
+      resultCode = 200;
+      message = "닉네임을 변경할 수 있습니다.";
     }
     return res.json({
       code: resultCode,
@@ -182,7 +182,7 @@ router.get("/confirm_mbti_modify", async (req, res, next) => {
     let now = new Date();
 
     if (
-      confirm_mbti[0] != null &&
+      confirm_mbti[0].updated_at_mbti != null &&
       now.getTime() - confirm_mbti[0].updated_at_mbti.getTime() < 2592000000
     ) {
       resultCode = 401;
