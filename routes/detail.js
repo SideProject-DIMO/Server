@@ -1,19 +1,19 @@
-const pool = require('../db');
-const puppeteer = require('puppeteer');
-const express = require('express');
+const pool = require("../db");
+const puppeteer = require("puppeteer");
+const express = require("express");
 const router = express.Router();
 
-router.post('/like', async (req, res, next) => {
-  const { user_id, content_type, contentId } = req.body;
+router.post("/like", async (req, res, next) => {
+  const {user_id, content_type, contentId} = req.body;
   let result_code = 404;
-  let message = '에러가 발생했습니다.';
+  let message = "에러가 발생했습니다.";
   try {
     const [like] = await pool.execute(
       `INSERT INTO dimo_like (content_type, content_id, user_id) VALUES (?, ?, ?)`,
       [content_type, contentId, user_id]
     );
     result_code = 200;
-    message = '좋아요를 눌렀습니다.';
+    message = "좋아요를 눌렀습니다.";
     return res.json({
       code: result_code,
       message: message,
@@ -25,17 +25,46 @@ router.post('/like', async (req, res, next) => {
   }
 });
 
-router.post('/dislike', async (req, res, next) => {
-  const { user_id, content_type, contentId } = req.body;
+router.post("/dislike", async (req, res, next) => {
+  const {user_id, content_type, contentId} = req.body;
   let result_code = 404;
-  let message = '에러가 발생했습니다.';
+  let message = "에러가 발생했습니다.";
   try {
     const [dislike] = await pool.execute(
       `DELETE FROM dimo_like WHERE user_id = ? and content_type = ? and content_id = ?`,
       [user_id, content_type, contentId]
     );
     result_code = 200;
-    message = '좋아요를 취소했습니다.';
+    message = "좋아요를 취소했습니다.";
+    return res.json({
+      code: result_code,
+      message: message,
+      user_id: user_id,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(err);
+  }
+});
+
+//좋아요 상태 확인
+router.get("/is_like", async (req, res, next) => {
+  const {user_id, content_type, contentId} = req.query;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+  try {
+    const [is_like] = await pool.execute(
+      `SELECT * FROM dimo_like WHERE user_id = ? and content_type = ? and content_id = ?`,
+      [user_id, content_type, contentId]
+    );
+
+    if (is_like[0] != null) {
+      result_code = 200;
+      message = "좋아요를 누른 콘텐츠입니다.";
+    } else {
+      result_code = 201;
+      message = "좋아요를 누르지 않은 콘텐츠입니다.";
+    }
     return res.json({
       code: result_code,
       message: message,
@@ -155,10 +184,10 @@ router.post('/dislike', async (req, res, next) => {
 // });
 
 // mbti별 평점 TOP3 조회하기
-router.get('/mbti_grade', async (req, res, next) => {
-  const { contentId, content_type } = req.query;
+router.get("/mbti_grade", async (req, res, next) => {
+  const {contentId, content_type} = req.query;
   let result_code = 400;
-  let message = '에러가 발생했습니다.';
+  let message = "에러가 발생했습니다.";
   try {
     const [mbti_grade] = await pool.execute(
       `SELECT * FROM dimo_grade_avg WHERE content_id = ? and content_type = ? ORDER BY mbti_grade_avg DESC LIMIT 3`,
@@ -166,7 +195,7 @@ router.get('/mbti_grade', async (req, res, next) => {
     );
 
     result_code = 200;
-    message = 'TOP3 mbti 평점을 성공적으로 조회했습니다.';
+    message = "TOP3 mbti 평점을 성공적으로 조회했습니다.";
 
     return res.json({
       code: result_code,
@@ -183,10 +212,10 @@ router.get('/mbti_grade', async (req, res, next) => {
 });
 
 // 상세 조회
-router.get('/animedata/:contentId', async (req, res, next) => {
+router.get("/animedata/:contentId", async (req, res, next) => {
   const contentId = req.params.contentId;
   let result_code = 400;
-  let message = '에러가 발생했습니다.';
+  let message = "에러가 발생했습니다.";
   try {
     let [detail] = await pool.execute(
       `SELECT * FROM anime_contents WHERE anime_id = ?`,
@@ -199,7 +228,7 @@ router.get('/animedata/:contentId', async (req, res, next) => {
     );
 
     result_code = 200;
-    message = contentId + '번 애니메이션 조회에 성공했습니다.';
+    message = contentId + "번 애니메이션 조회에 성공했습니다.";
     return res.json({
       code: result_code,
       message: message,
