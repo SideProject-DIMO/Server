@@ -53,12 +53,13 @@ CREATE TABLE `anime_contents` (
   `anime_id` int(11) NOT NULL,
   `title` varchar(50) DEFAULT NULL,
   `genre` varchar(80) DEFAULT NULL,
-  `plot` varchar(800) DEFAULT NULL,
+  `plot` varchar(1200) DEFAULT NULL,
   `poster_img` varchar(300) DEFAULT NULL,
   `director` varchar(40) DEFAULT NULL,
   `release` varchar(40) DEFAULT NULL,
-  `rate` float DEFAULT NULL,
-  PRIMARY KEY (`anime_id`)
+  `rate` varchar(5) DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- 애니메이션 캐릭터
