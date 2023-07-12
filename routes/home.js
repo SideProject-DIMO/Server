@@ -8,14 +8,31 @@ router.get("/", async (req, res, next) => {
   let result_code = 400;
   let message = "에러가 발생했습니다.";
   try {
-    let [home] = await pool.execute(`SELECT * FROM anime_contents`); //카테고리나 제약 조건 추가.. + 랜덤성
+    let rand_num = [];
+
+    for (let i = 0; i < 5; i++) {
+      rand_num[i] = Math.floor(Math.random() * (100 - 1) + 1);
+    }
+
+    let [represent] = await pool.execute(
+      `SELECT * FROM anime_contents WHERE id = ? or id = ? or id = ? or id = ? or id= ?`,
+      [rand_num[0], rand_num[1], rand_num[2], rand_num[3], rand_num[4]]
+    ); //카테고리나 제약 조건 추가.. + 랜덤성
+
+    let [recommend] = await pool.execute(
+      `SELECT * FROM anime_contents WHERE anime_id in (SELECT content_id FROM dimo_like WHERE user_id in (SELECT user_id FROM user WHERE mbti = (SELECT mbti FROM user WHERE user_id = ?))) LIMIT 10`,
+      [user_id]
+    ); //같은 mbti 사용자가 추천한 영화
 
     result_code = 200;
     message = "홈 화면 조회에 성공했습니다.";
     return res.json({
       code: result_code,
       message: message,
-      contents: home,
+      contents: [
+        {category: "represent", represent},
+        {category: "recommend", recommend},
+      ],
     });
   } catch (error) {
     console.error(error);
