@@ -1,24 +1,24 @@
-const pool = require("../db");
-const puppeteer = require("puppeteer");
-const express = require("express");
+const pool = require('../db');
+const puppeteer = require('puppeteer');
+const express = require('express');
 const router = express.Router();
-const readline = require("readline");
-const fs = require("fs");
+const readline = require('readline');
+const fs = require('fs');
 
-router.get("/animedata", async (req, res) => {
+router.get('/animedata', async (req, res) => {
   try {
     // 크롤링 시작
     const browser = await puppeteer.launch({
       headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
 
     //urls.txt 크롤링 순환
-    const urls = fs.readFileSync("urls.txt", "utf-8").split("\n");
+    const urls = fs.readFileSync('urls.txt', 'utf-8').split('\n');
 
     const results = [];
     for (let url of urls) {
-      if (url.trim() !== "") {
+      if (url.trim() !== '') {
         const page = await browser.newPage();
         await page.goto(url.trim());
 
@@ -32,29 +32,41 @@ router.get("/animedata", async (req, res) => {
         //   posterElement
         // );
 
-        // 프로필+캐릭터명, 작품명, 줄거리
-        const grabData = await page.$$eval(".view-chacon li", (items) => {
+        // 캐릭터 프로필 이미지+캐릭터명, 작품명, 줄거리
+        const grabData = await page.$$eval('.view-chacon li', (items) => {
           const data = [];
 
           //캐릭터 정보 최대 20명까지만
           for (let i = 0; i < Math.min(items.length, 20); i++) {
             const item = items[i];
-            const photoDiv = item.querySelector(".photo");
-            const listDiv = item.querySelector(".list");
-            let characterImg = "";
-            let characterName = "";
+            const photoDiv = item.querySelector('.photo');
+            const listDiv = item.querySelector('.list');
+            let characterImg = '';
+            let characterName = '';
 
             if (photoDiv) {
-              const img = photoDiv.querySelector("img");
+              const img = photoDiv.querySelector('img');
               if (img) {
-                characterImg = img.getAttribute("data-original");
+                characterImg = img.getAttribute('data-original');
               }
             }
 
+            //캐릭터명 (영문) 없이 한글명만 가지고 오도록
             if (listDiv) {
-              const box1 = listDiv.querySelector(".box1");
+              const box1 = listDiv.querySelector('.box1');
               if (box1) {
-                characterName = box1.querySelector(".name").textContent;
+                const characterNameElement = box1.querySelector('.name');
+                if (characterNameElement) {
+                  const characterNameText = characterNameElement.textContent;
+                  const indexOfParentheses = characterNameText.indexOf('(');
+                  if (indexOfParentheses !== -1) {
+                    characterName = characterNameText
+                      .substring(0, indexOfParentheses)
+                      .trim();
+                  } else {
+                    characterName = characterNameText.trim();
+                  }
+                }
               }
             }
 
@@ -64,11 +76,13 @@ router.get("/animedata", async (req, res) => {
             });
           }
 
-          const titleTag = document.querySelector(".view-title h1");
-          const title = titleTag ? titleTag.innerHTML : "";
+          const titleTag = document.querySelector('.view-title h1');
+          const title = titleTag ? titleTag.innerHTML : '';
 
-          const plotTag = document.querySelector(".c");
-          const plot = plotTag ? plotTag.innerHTML : "";
+          const plotTag = document.querySelector('.c');
+          // <br>태그 제외
+          let plot = plotTag ? plotTag.innerHTML.replace(/<br>/g, '') : '';
+          plot = plot.trim();
 
           return {
             title,
@@ -214,8 +228,8 @@ router.get("/animedata", async (req, res) => {
 
     res.json(results);
   } catch (error) {
-    console.error("Error during crawling:", error);
-    res.status(500).send("Error during crawling");
+    console.error('Error during crawling:', error);
+    res.status(500).send('Error during crawling');
   }
 });
 
