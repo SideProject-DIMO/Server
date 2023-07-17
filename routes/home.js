@@ -11,13 +11,13 @@ router.get("/", async (req, res, next) => {
     let rand_num = [];
 
     for (let i = 0; i < 5; i++) {
-      rand_num[i] = Math.floor(Math.random() * (100 - 1) + 1);
+      rand_num[i] = Math.floor(Math.random() * (100 - 1) + 1); //1~100까지 랜덤 선택
     }
 
     let [represent] = await pool.execute(
       `SELECT * FROM anime_contents WHERE id = ? or id = ? or id = ? or id = ? or id= ?`,
       [rand_num[0], rand_num[1], rand_num[2], rand_num[3], rand_num[4]]
-    ); //카테고리나 제약 조건 추가.. + 랜덤성
+    ); //랜덤 콘텐츠 
 
     let [recommend] = await pool.execute(
       `SELECT * FROM anime_contents WHERE anime_id in (SELECT content_id FROM dimo_like WHERE user_id in (SELECT user_id FROM user WHERE mbti = (SELECT mbti FROM user WHERE user_id = ?))) LIMIT 10`,
