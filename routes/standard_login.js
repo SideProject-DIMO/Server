@@ -25,6 +25,7 @@ router.post("/login", async (req, res, next) => {
         message: message,
         user_id: user_id,
         access_token: access_token,
+        refresh_token: ""
       });
     } else if (!bcrypt.compareSync(password, data[0][0].password)) {
       // 비밀번호가 다르다면
@@ -36,6 +37,7 @@ router.post("/login", async (req, res, next) => {
         message: message,
         user_id: user_id,
         access_token: access_token,
+        refresh_token: ""
       });
     } else {
       // 다른 경우는 없다고 판단하여 성공
