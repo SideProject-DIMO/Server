@@ -50,6 +50,7 @@ CREATE TABLE `drop_reason` (
 
 -- 콘텐츠 애니메이션 
 CREATE TABLE `anime_contents` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `anime_id` int(11) NOT NULL,
   `title` varchar(50) DEFAULT NULL,
   `genre` varchar(80) DEFAULT NULL,
@@ -58,7 +59,6 @@ CREATE TABLE `anime_contents` (
   `director` varchar(40) DEFAULT NULL,
   `release` varchar(40) DEFAULT NULL,
   `rate` varchar(5) DEFAULT NULL,
-  `id` int(11) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
