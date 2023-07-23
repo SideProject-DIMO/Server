@@ -37,10 +37,26 @@ router.post("/mod_profile", async (req, res, next) => {
   let result_code = 404;
   let message = "에러가 발생했습니다";
   try {
-    const [mod_profile] = await pool.execute(
-      `UPDATE user SET profile_img = ?, intro = ? WHERE user_id = ?`,
-      [profile_img, intro, user_id]
-    );
+    //프로필 이미지 수정x
+    if (profile_img == null) {
+      await pool.execute(`UPDATE user SET intro = ? WHERE user_id = ?`, [
+        intro,
+        user_id,
+      ]);
+    } else if (intro == null) {
+      //인트로 수정x
+      await pool.execute(`UPDATE user SET profile_img = ? WHERE user_id = ?`, [
+        profile_img,
+        user_id,
+      ]);
+    } else {
+      //둘 다 수정
+      await pool.execute(
+        `UPDATE user SET profile_img = ?, intro = ? WHERE user_id = ?`,
+        [profile_img, intro, user_id]
+      );
+    }
+
     result_code = 200;
     message = "내 프로필 수정 성공";
     return res.json({
