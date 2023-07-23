@@ -1,19 +1,19 @@
-const pool = require("../db");
-const puppeteer = require("puppeteer");
-const express = require("express");
+const pool = require('../db');
+const puppeteer = require('puppeteer');
+const express = require('express');
 const router = express.Router();
 
-router.post("/like", async (req, res, next) => {
-  const {user_id, content_type, contentId} = req.body;
+router.post('/like', async (req, res, next) => {
+  const { user_id, content_type, contentId } = req.body;
   let result_code = 404;
-  let message = "에러가 발생했습니다.";
+  let message = '에러가 발생했습니다.';
   try {
     const [like] = await pool.execute(
       `INSERT INTO dimo_like (content_type, content_id, user_id) VALUES (?, ?, ?)`,
       [content_type, contentId, user_id]
     );
     result_code = 200;
-    message = "좋아요를 눌렀습니다.";
+    message = '좋아요를 눌렀습니다.';
     return res.json({
       code: result_code,
       message: message,
@@ -25,17 +25,17 @@ router.post("/like", async (req, res, next) => {
   }
 });
 
-router.post("/dislike", async (req, res, next) => {
-  const {user_id, content_type, contentId} = req.body;
+router.post('/dislike', async (req, res, next) => {
+  const { user_id, content_type, contentId } = req.body;
   let result_code = 404;
-  let message = "에러가 발생했습니다.";
+  let message = '에러가 발생했습니다.';
   try {
     const [dislike] = await pool.execute(
       `DELETE FROM dimo_like WHERE user_id = ? and content_type = ? and content_id = ?`,
       [user_id, content_type, contentId]
     );
     result_code = 200;
-    message = "좋아요를 취소했습니다.";
+    message = '좋아요를 취소했습니다.';
     return res.json({
       code: result_code,
       message: message,
@@ -245,6 +245,87 @@ router.get("/animedata/:contentId", async (req, res, next) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json(error);
+  }
+});
+
+router.get('/moviedata/:movieId', async (req, res) => {
+  try {
+    // 영화 ID
+    const movieId = req.query.movieId; // 요청 쿼리 파라미터로부터 영화 ID 받기
+
+    // TMDB API 키
+    const apiKey = '9e43a6867c994baa79d59e3d65755b86';
+
+    // TMDB API 요청 URL
+    const apiUrl = `https://api.themoviedb.org/3`;
+
+    // 영화 정보를 가져오는 함수
+    async function getMovieInfo(movieId) {
+      try {
+        // 영화 상세 정보 요청
+        const response = await axios.get(
+          `${apiUrl}/movie/${movieId}?language=ko`,
+          {
+            params: {
+              api_key: apiKey,
+            },
+          }
+        );
+
+        // 감독 및 캐릭터 정보 요청
+        const creditsResponse = await axios.get(
+          `${apiUrl}/movie/${movieId}/credits?language=ko`,
+          {
+            params: {
+              api_key: apiKey,
+            },
+          }
+        );
+
+        // 영화 정보
+        const movieInfo = response.data;
+        const title = movieInfo.title;
+        const plot = movieInfo.overview;
+        const release_date = movieInfo.release_date;
+        const genres = movieInfo.genres;
+        const runtime = movieInfo.runtime;
+        const posterImg = movieInfo.poster_path;
+        const movieID = movieInfo.belongs_to_collection.id;
+
+        // 감독
+        const director = creditsResponse.data.crew.find(
+          (person) => person.job === 'Director'
+        );
+
+        // 캐릭터 정보
+        const characters = creditsResponse.data.cast.slice(0, 15); // 상위 15명의 캐릭터 정보만
+
+        // 영화 정보 return
+        return {
+          title,
+          plot,
+          release_date,
+          genres,
+          runtime,
+          posterImg,
+          movieID,
+          director: director.name,
+          characters: characters.map((character) => ({
+            profileImg: character.profile_path,
+            characterName: character.character,
+          })),
+        };
+      } catch (error) {
+        throw new Error(error.message);
+      }
+    }
+
+    // 영화 정보 가져오기
+    const movieInfo = await getMovieInfo(movieId);
+
+    res.json(movieInfo);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
