@@ -29,16 +29,9 @@ CREATE TABLE `sms_validation` (
 
 -- 콘텐츠 영화 
 CREATE TABLE `movie_contents` (
-  `movie_id` int(11) NOT NULL,
-  `title` varchar(50) DEFAULT NULL,
-  `genre` varchar(50) DEFAULT NULL,
-  `running_time` varchar(10) DEFAULT NULL,
-  `plot` varchar(500) DEFAULT NULL,
-  `poster_img` varchar(100) DEFAULT NULL,
-  `rate` float DEFAULT NULL,
-  `director` varchar(10) DEFAULT NULL,
-  `release` varchar(40) DEFAULT NULL,
-  PRIMARY KEY (`movie_id`)
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `movie_id` varchar(20) NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- 탈퇴 사유
