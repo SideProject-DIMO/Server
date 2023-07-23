@@ -72,11 +72,17 @@ router.get("/change_pw", async (req, res, next) => {
       );
     }
 
+    let [sql_password] = await pool.execute(
+      `SELECT password FROM user WHERE user_id = ?`,
+      [user_id]
+    );
+
     return res.json({
       code: result_code,
       message: message,
       message_confirm_pw: message_confirm_pw,
-      past_password: password,
+      past_password: is_pw_dup[0].password,
+      new_password: sql_password[0].password,
       user_id: user_id,
     });
   } catch (err) {
