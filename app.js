@@ -22,10 +22,7 @@ app.post('/drop', require('./routes/drop.js'));
 app.use('/user_info', require('./routes/change_user_info'));
 
 //크롤링
-app.use('/crawling', require('./routes/anime_data_crawling.js'));
-
-//영화 home
-app.use('/home', require('./routes/movie_home.js'));
+app.use('/crawling', require('./routes/crawling.js'));
 
 //홈 조회
 app.use("/home", require("./routes/home.js"));
