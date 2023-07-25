@@ -13,7 +13,7 @@ router.get("/animedata", async (req, res) => {
     });
 
     //urls.txt 크롤링 순환
-    const urls = fs.readFileSync("urls.txt", "utf-8").split("\n");
+    const urls = fs.readFileSync("anime_id.txt", "utf-8").split("\n");
 
     const results = [];
     for (let url of urls) {
@@ -179,7 +179,7 @@ router.get("/animedata", async (req, res) => {
         // }
 
         const [save_anime_data] = await pool.execute(
-          `INSERT INTO anime_contents (anime_id, title, genre, plot, poster_img, director, release, rate) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          `INSERT INTO anime_contents (anime_id, title, genre, plot, poster_img, director, anime_release, rate) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             contentId,
             grabData.title,

@@ -75,11 +75,13 @@ router.get("/like_anime_content", async (req, res, next) => {
   const {user_id} = req.query;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
+
   try {
     const [my_like_content] = await pool.execute(
-      `SELECT content_id FROM dimo_like WHERE user_id = ? and content_type = 'anime'`,
+      `SELECT anime_id, poster_img FROM anime_contents WHERE anime_id in (SELECT content_id FROM dimo_like WHERE user_id = ?)`,
       [user_id]
     );
+    console.log(my_like_content);
     if (my_like_content[0] == null) {
       result_code = 201;
       message = "좋아요 누른 애니메이션 없음";
@@ -91,7 +93,7 @@ router.get("/like_anime_content", async (req, res, next) => {
     return res.json({
       code: result_code,
       message: message,
-      like_content: my_like_content,
+      like_content_info: my_like_content,
     });
   } catch (err) {
     console.error(err);
