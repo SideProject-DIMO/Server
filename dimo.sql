@@ -50,7 +50,7 @@ CREATE TABLE `anime_contents` (
   `plot` varchar(1200) DEFAULT NULL,
   `poster_img` varchar(300) DEFAULT NULL,
   `director` varchar(40) DEFAULT NULL,
-  `release` varchar(40) DEFAULT NULL,
+  `anime_release` varchar(40) DEFAULT NULL,
   `rate` varchar(5) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
