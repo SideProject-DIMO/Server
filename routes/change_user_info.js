@@ -61,8 +61,6 @@ router.get("/change_pw", async (req, res, next) => {
         message = "같은 비밀번호가 입력되었습니다.";
       } else {
         result_code = 200;
-        //확인용 코드 추가
-        result_code = 401;
         message = "비밀번호가 성공적으로 변경되었습니다.";
       }
 
