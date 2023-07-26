@@ -122,7 +122,6 @@ router.get("/recommend", async (req, res, next) => {
   let message = "에러가 발생했습니다.";
   let random_sorted_arr;
   try {
-    //랜덤 추천
     function getRandomInt(max) {
       return Math.floor(Math.random() * max);
     }
@@ -138,14 +137,14 @@ router.get("/recommend", async (req, res, next) => {
     }
 
     if (category == "rand") {
-      // 모든 캐릭터 가져오기
+      //랜덤순
       [rand_char] = await pool.execute(`SELECT * FROM anime_character`);
       random_sorted_arr = randomSort(rand_char);
 
       result_code = 200;
       message = "캐릭터 랜덤 추천 성공";
     } else {
-      // 모든 캐릭터 가져오기
+      //인기순
       [pop_char] = await pool.execute(
         `SELECT DISTINCT anime_character_vote.character_id, content_id, character_name, character_img FROM anime_character_vote JOIN anime_character ON anime_character.character_id = anime_character_vote.character_id ORDER BY anime_character_vote.character_id DESC;`
       );
