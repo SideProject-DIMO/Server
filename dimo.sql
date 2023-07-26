@@ -94,3 +94,17 @@ CREATE TABLE `dimo_grade_avg` (
   `mbti_grade_sum` float DEFAULT NULL,
   PRIMARY KEY (`content_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- 애니메이션 캐릭터 투표
+CREATE TABLE `anime_character_vote` (
+  `vote_id` int NOT NULL AUTO_INCREMENT,
+  `character_id` int NOT NULL,
+  `user_mbti` varchar(4) NOT NULL,
+  `user_id` varchar(30) NOT NULL,
+  `energy` varchar(1) NOT NULL,
+  `recognization` varchar(1) NOT NULL,
+  `prediction` varchar(1) NOT NULL,
+  `reaction` varchar(1) NOT NULL,
+  `content_id` int NOT NULL,
+  PRIMARY KEY (`vote_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
