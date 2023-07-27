@@ -2,6 +2,8 @@ const pool = require("../db");
 const puppeteer = require("puppeteer");
 const express = require("express");
 const router = express.Router();
+const axios = require("axios");
+require("dotenv").config();
 
 router.post("/like", async (req, res, next) => {
   const {user_id, content_type, contentId} = req.body;
@@ -227,6 +229,11 @@ router.get("/animedata/:contentId", async (req, res, next) => {
       [contentId]
     );
 
+    await pool.execute(
+      `UPDATE anime_contents SET hits = hits + 1 WHERE anime_id = ?`,
+      [contentId]
+    );
+
     result_code = 200;
     message = contentId + "번 애니메이션 조회에 성공했습니다.";
     return res.json({
@@ -248,49 +255,43 @@ router.get("/animedata/:contentId", async (req, res, next) => {
   }
 });
 
-router.get("/moviedata/:movieId", async (req, res) => {
+router.get("/moviedata/:movie_id", async (req, res) => {
   try {
     // 영화 ID
-    const movieId = req.query.movieId; // 요청 쿼리 파라미터로부터 영화 ID 받기
-
-    // TMDB API 키
-    const apiKey = "9e43a6867c994baa79d59e3d65755b86";
+    const movie_id = req.params.movie_id; // 요청 쿼리 파라미터로부터 영화 ID 받기
 
     // TMDB API 요청 URL
     const apiUrl = `https://api.themoviedb.org/3`;
 
     // 영화 정보를 가져오는 함수
-    async function getMovieInfo(movieId) {
+    async function getMovieInfo(id) {
       try {
         // 영화 상세 정보 요청
-        const response = await axios.get(
-          `${apiUrl}/movie/${movieId}?language=ko`,
-          {
-            params: {
-              api_key: apiKey,
-            },
-          }
-        );
+        const response = await axios.get(`${apiUrl}/movie/${id}?language=ko`, {
+          params: {
+            api_key: process.env.api_key,
+          },
+        });
 
         // 감독 및 캐릭터 정보 요청
         const creditsResponse = await axios.get(
-          `${apiUrl}/movie/${movieId}/credits?language=ko`,
+          `${apiUrl}/movie/${id}/credits?language=ko`,
           {
             params: {
-              api_key: apiKey,
+              api_key: process.env.api_key,
             },
           }
         );
 
         // 영화 정보
-        const movieInfo = response.data;
-        const title = movieInfo.title;
-        const plot = movieInfo.overview;
-        const release_date = movieInfo.release_date;
-        const genres = movieInfo.genres;
-        const runtime = movieInfo.runtime;
-        const posterImg = movieInfo.poster_path;
-        const movieID = movieInfo.belongs_to_collection.id;
+        const movie_info = response.data;
+        const title = movie_info.title;
+        const plot = movie_info.overview;
+        const release_date = movie_info.release_date;
+        const genres = movie_info.genres;
+        const runtime = movie_info.runtime;
+        const poster_img = movie_info.poster_path;
+        const movie_id = movie_info.id;
 
         // 감독
         const director = creditsResponse.data.crew.find(
@@ -307,12 +308,12 @@ router.get("/moviedata/:movieId", async (req, res) => {
           release_date,
           genres,
           runtime,
-          posterImg,
-          movieID,
+          poster_img,
+          movie_id,
           director: director.name,
           characters: characters.map((character) => ({
-            profileImg: character.profile_path,
-            characterName: character.character,
+            profile_img: character.profile_path,
+            character_name: character.character,
           })),
         };
       } catch (error) {
@@ -321,9 +322,9 @@ router.get("/moviedata/:movieId", async (req, res) => {
     }
 
     // 영화 정보 가져오기
-    const movieInfo = await getMovieInfo(movieId);
+    // const movie_info = await getMovieInfo(movie_id);
 
-    res.json(movieInfo);
+    res.json(await getMovieInfo(movie_id));
   } catch (error) {
     res.status(500).json({error: error.message});
   }
