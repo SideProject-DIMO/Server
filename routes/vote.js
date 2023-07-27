@@ -191,4 +191,35 @@ router.get("/search", async (req, res, next) => {
   }
 });
 
+router.get("/another_character", async (req, res, next) => {
+  //같은 작품 속 다른 캐릭터 조회
+  let {user_id, character_id} = req.query;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+
+  try {
+    let [content] = await pool.execute(
+      `SELECT anime_id FROM anime_character WHERE character_id = ?`,
+      [character_id]
+    );
+
+    let [another_character] = await pool.execute(
+      `SELECT * FROM anime_character WHERE anime_id = ? and character_id != ?`,
+      [content[0].anime_id, character_id]
+    );
+
+    result_code = 200;
+    message = "같은 작품 내 다른 캐릭터 조회 성공";
+    return res.json({
+      code: result_code,
+      message: message,
+      user_id: user_id,
+      result: another_character,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(error);
+  }
+});
+
 module.exports = router;
