@@ -204,8 +204,8 @@ router.get("/another_character", async (req, res, next) => {
     );
 
     let [another_character] = await pool.execute(
-      `SELECT * FROM anime_character WHERE anime_id = ? and character_id != ?`,
-      [content[0].anime_id, character_id]
+      `SELECT * FROM anime_character WHERE anime_id = ?`,
+      [content[0].anime_id]
     );
 
     result_code = 200;
