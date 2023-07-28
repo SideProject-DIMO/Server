@@ -5,7 +5,7 @@ const router = express.Router();
 router.post("/", async (req, res, next) => {
   //투표하기
   const {user_id, content_id, character_id, ei, sn, tf, jp} = req.body;
-  let result_code = 400;
+  let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
     let [is_vote] = await pool.execute(
@@ -102,7 +102,7 @@ router.post("/", async (req, res, next) => {
         mbti_percent: mbti,
       });
     } else {
-      result_code = 400;
+      result_code = 404;
       message = "이미 투표한 캐릭터입니다.";
 
       return res.json({
@@ -118,7 +118,7 @@ router.post("/", async (req, res, next) => {
 
 router.get("/recommend", async (req, res, next) => {
   const {user_id, category} = req.query;
-  let result_code = 400;
+  let result_code = 404;
   let message = "에러가 발생했습니다.";
   let random_sorted_arr;
   try {
@@ -168,7 +168,7 @@ router.get("/recommend", async (req, res, next) => {
 router.get("/search", async (req, res, next) => {
   //검색
   let {user_id, search_content} = req.query;
-  let result_code = 400;
+  let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
     search_content = "%" + search_content + "%";

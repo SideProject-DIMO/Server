@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 let bodyParser = require("body-parser");
+const {route} = require("./routes/vote.js");
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
@@ -29,6 +30,9 @@ app.use("/home", require("./routes/home.js"));
 
 //상세 조회
 app.use("/detail", require("./routes/detail.js"));
+
+//캐릭터 조회
+app.use("/character", require("./routes/character_detail.js"));
 
 //투표
 app.use("/vote", require("./routes/vote.js"));
