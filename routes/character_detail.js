@@ -37,7 +37,7 @@ router.post("/write_review", async (req, res, next) => {
   let message = "에러가 발생했습니다.";
   try {
     await pool.execute(
-      `INSERT INTO character_review(user_id, character_id, review_content, review_spoiler) VALUES (?, ?, ?)`,
+      `INSERT INTO character_review(user_id, character_id, review_content, review_spoiler) VALUES (?, ?, ?, ?)`,
       [user_id, character_id, review_content, review_spoiler]
     );
     result_code = 200;
