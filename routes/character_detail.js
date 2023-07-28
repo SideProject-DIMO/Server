@@ -5,7 +5,7 @@ const router = express.Router();
 router.get("/", async (req, res, next) => {
   // 리뷰 조회
   const {user_id, character_id} = req.query;
-  let result_code = 400;
+  let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
     await pool.execute(
@@ -33,7 +33,7 @@ router.get("/", async (req, res, next) => {
 router.post("/write_review", async (req, res, next) => {
   //리뷰 작성
   const {user_id, character_id, review_content, review_spoiler} = req.body;
-  let result_code = 400;
+  let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
     await pool.execute(
@@ -57,7 +57,7 @@ router.post("/write_review", async (req, res, next) => {
 router.post("/review_like", async (req, res, next) => {
   //리뷰 좋아요 누르기
   const {user_id, character_id, review_id} = req.body;
-  let result_code = 400;
+  let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
     let [is_like] = await pool.execute(
@@ -97,7 +97,7 @@ router.post("/review_like", async (req, res, next) => {
 router.post("/review_dislike", async (req, res, next) => {
   //리뷰 좋아요 취소하기
   const {user_id, character_id, review_id} = req.body;
-  let result_code = 400;
+  let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
     await pool.execute(
@@ -127,7 +127,7 @@ router.post("/review_dislike", async (req, res, next) => {
 router.delete("/delete_review", async (req, res, next) => {
   //리뷰 삭제하기
   const {user_id, character_id, review_id} = req.body;
-  let result_code = 400;
+  let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
     await pool.execute(`DELETE FROM review_like WHERE review_id = ?`, [
