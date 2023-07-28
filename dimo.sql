@@ -145,5 +145,6 @@ CREATE TABLE `review_like` (
   `review_like_id` int(11) NOT NULL AUTO_INCREMENT,
   `character_id` int(11) NOT NULL,
   `user_id` varchar(30) NOT NULL,
+  `review_id` int(11) NOT NULL,
   PRIMARY KEY (`review_like_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
