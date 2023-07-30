@@ -129,7 +129,6 @@ router.post("/modify_review", async (req, res, next) => {
   //리뷰 수정하기
   const {user_id, character_id, review_content, review_spoiler, review_id} =
     req.body;
-  console.log(review_content);
   let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
@@ -275,7 +274,7 @@ router.delete("/delete_comment", async (req, res, next) => {
       `SELECT * FROM comment_like WHERE comment_id = ?`,
       [comment_id]
     );
-    if (is_review_exist[0] != null) {
+    if (is_comment_exist[0] != null) {
       await pool.execute(`DELETE FROM comment_like WHERE comment_id = ?`, [
         comment_id,
       ]);
