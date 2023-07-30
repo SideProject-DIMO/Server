@@ -110,19 +110,20 @@ CREATE TABLE `anime_character_vote` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- 캐릭터에 리뷰하기
-CREATE TABLE `review_comment` (
-  `comment_id` int(11) NOT NULL AUTO_INCREMENT,
-  `review_id` int(11) NOT NULL,
+CREATE TABLE `character_review` (
+  `review_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` varchar(30) NOT NULL,
-  `comment_like` int(11) DEFAULT '0',
-  `comment_content` varchar(500) NOT NULL,
-  `spoiler` int(11) DEFAULT '0',
-  PRIMARY KEY (`comment_id`),
+  `character_id` int(11) NOT NULL,
+  `review_content` varchar(500) NOT NULL,
+  `review_like` int(11) DEFAULT '0',
+  `review_hits` int(11) DEFAULT '0',
+  `review_spoiler` int(11) DEFAULT '0',
+  PRIMARY KEY (`review_id`),
   KEY `user_id` (`user_id`),
-  KEY `review_id` (`review_id`),
-  CONSTRAINT `review_comment_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
-  CONSTRAINT `review_comment_ibfk_2` FOREIGN KEY (`review_id`) REFERENCES `character_review` (`review_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  KEY `character_id` (`character_id`),
+  CONSTRAINT `character_review_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
+  CONSTRAINT `character_review_ibfk_2` FOREIGN KEY (`character_id`) REFERENCES `anime_character` (`character_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- 리뷰 댓글
@@ -132,7 +133,7 @@ CREATE TABLE `review_comment` (
   `user_id` varchar(30) NOT NULL,
   `comment_like` int(11) DEFAULT '0',
   `comment_content` varchar(500) NOT NULL,
-  `spoiler` int(11) DEFAULT '0',
+  `comment_spoiler` int(11) DEFAULT '0',
   PRIMARY KEY (`comment_id`),
   KEY `user_id` (`user_id`),
   KEY `review_id` (`review_id`),
