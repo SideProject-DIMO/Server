@@ -130,7 +130,36 @@ router.get("/like_movie_content", async (req, res, next) => {
   }
 });
 
-//내가 쓴 리뷰 조회하기
+//내가 쓴 댓글 조회하기
+router.get("/comment", async (req, res, next) => {
+  const {user_id} = req.query;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+  try {
+    const [my_comment] = await pool.execute(
+      `SELECT * FROM review_comment WHERE user_id = ?`,
+      [user_id]
+    );
+    if (my_comment[0] == null) {
+      result_code = 201;
+      message = "작성한 댓글이 없습니다.";
+    } else {
+      result_code = 200;
+      message = "작성한 댓글을 조회했습니다.";
+    }
+
+    return res.json({
+      code: result_code,
+      message: message,
+      comment: my_comment,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(err);
+  }
+});
+
+//내가 쓴 댓글 조회하기
 router.get("/review", async (req, res, next) => {
   const {user_id} = req.query;
   let result_code = 404;
