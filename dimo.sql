@@ -125,7 +125,6 @@ CREATE TABLE `character_review` (
   CONSTRAINT `character_review_ibfk_2` FOREIGN KEY (`character_id`) REFERENCES `anime_character` (`character_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-
 -- 리뷰 댓글
 CREATE TABLE `review_comment` (
   `comment_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -134,6 +133,7 @@ CREATE TABLE `review_comment` (
   `comment_like` int(11) DEFAULT '0',
   `comment_content` varchar(500) NOT NULL,
   `comment_spoiler` int(11) DEFAULT '0',
+  `character_id` int(11) NOT NULL,
   PRIMARY KEY (`comment_id`),
   KEY `user_id` (`user_id`),
   KEY `review_id` (`review_id`),
