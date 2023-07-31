@@ -25,11 +25,6 @@ router.get("/", async (req, res, next) => {
       }
     }
 
-    // let [user_info] = await pool.execute(
-    //   `SELECT nickname, mbti, profile_img FROM user WHERE user_id = ?`,
-    //   [user_id]
-    // );
-
     result_code = 200;
     message = "전체 리뷰를 조회했습니다.";
     return res.json({
@@ -37,7 +32,6 @@ router.get("/", async (req, res, next) => {
       message: message,
       user_id: user_id,
       review_list: view_review,
-      // user_info: user_info,
     });
   } catch (err) {
     console.error(err);
@@ -75,8 +69,6 @@ router.get("/review_detail", async (req, res, next) => {
       user_id: user_id,
       character_id: character_id,
       review_list: view_review,
-      // user_info: user_info,
-      // comment_count: comment_count,
     });
   } catch (err) {
     console.error(err);
