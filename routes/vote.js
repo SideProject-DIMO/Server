@@ -138,8 +138,10 @@ router.get("/recommend", async (req, res, next) => {
 
     if (category == "rand") {
       //랜덤순
-      [rand_char] = await pool.execute(`SELECT * FROM anime_character`);
-      random_sorted_arr = randomSort(rand_char);
+      [rand_char] = await pool.execute(
+        `SELECT character_id, character_img, character_name, character_mbti, title FROM anime_character JOIN anime_contents ON anime_character.anime_id = anime_contents.anime_id ORDER BY rand() LIMIT 300`
+      );
+      // random_sorted_arr = randomSort(rand_char);
 
       result_code = 200;
       message = "캐릭터 랜덤 추천 성공";
@@ -157,7 +159,7 @@ router.get("/recommend", async (req, res, next) => {
       code: result_code,
       message: message,
       user_id: user_id,
-      character_info: category == "rand" ? random_sorted_arr : pop_char,
+      character_info: category == "rand" ? rand_char : pop_char,
     });
   } catch (err) {
     console.error(err);
