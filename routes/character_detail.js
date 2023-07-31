@@ -3,26 +3,80 @@ const express = require("express");
 const router = express.Router();
 
 router.get("/", async (req, res, next) => {
-  // 리뷰 조회
+  // 리뷰 전체 조회하기
   const {user_id, character_id} = req.query;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
-    await pool.execute(
-      `UPDATE character_review SET review_hits = review_hits + 1 WHERE character_id = ?`,
-      [character_id]
-    );
     let [view_review] = await pool.execute(
-      `SELECT * FROM character_review WHERE character_id = ?`,
+      `SELECT review_id, user.user_id, character_id, review_content, review_like, review_hits, review_spoiler, nickname, mbti, profile_img FROM character_review JOIN user ON character_review.user_id = user.user_id WHERE character_id = ?`,
       [character_id]
     );
+    for (let rev of view_review) {
+      let [comment_count] = await pool.execute(
+        `SELECT COUNT(*) AS count FROM review_comment WHERE review_id = ? `,
+        [rev.review_id]
+      );
+
+      if (comment_count[0].count != 0) {
+        rev.comment_count = comment_count[0].count;
+      } else {
+        rev.comment_content = 0;
+      }
+    }
+
+    // let [user_info] = await pool.execute(
+    //   `SELECT nickname, mbti, profile_img FROM user WHERE user_id = ?`,
+    //   [user_id]
+    // );
+
     result_code = 200;
-    message = "리뷰를 조회했습니다.";
+    message = "전체 리뷰를 조회했습니다.";
     return res.json({
       code: result_code,
       message: message,
       user_id: user_id,
       review_list: view_review,
+      // user_info: user_info,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(error);
+  }
+});
+
+router.get("/review_detail", async (req, res, next) => {
+  // 리뷰 상세 조회하기
+  const {user_id, character_id, review_id} = req.query;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+  try {
+    await pool.execute(
+      `UPDATE character_review SET review_hits = review_hits + 1 WHERE review_id = ?`,
+      [review_id]
+    );
+    let [view_review] = await pool.execute(
+      `SELECT review_id, user.user_id, character_id, review_content, review_like, review_hits, review_spoiler, nickname, mbti, profile_img FROM character_review JOIN user ON character_review.user_id = user.user_id WHERE review_id = ?`,
+      [review_id]
+    );
+
+    let [comment_count] = await pool.execute(
+      `SELECT COUNT(*) AS count FROM review_comment WHERE review_id = ? `,
+      [review_id]
+    );
+
+    view_review.comment_count = comment_count[0].count;
+
+    result_code = 200;
+    message = "상세 리뷰를 조회했습니다.";
+    return res.json({
+      code: result_code,
+      message: message,
+      user_id: user_id,
+      character_id: character_id,
+      review_list: view_review,
+      // user_info: user_info,
+      // comment_count: comment_count,
     });
   } catch (err) {
     console.error(err);
