@@ -21,7 +21,7 @@ router.get("/", async (req, res, next) => {
       if (comment_count[0].count != 0) {
         rev.comment_count = comment_count[0].count;
       } else {
-        rev.comment_content = 0;
+        rev.comment_count = 0;
       }
     }
 
