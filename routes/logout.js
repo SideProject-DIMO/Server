@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 
 // 로그아웃
-router.get("/logout", async (req, res) => {
+router.get("/", async (req, res) => {
   let resultCode = 404;
   let message = "에러가 발생했습니다";
 
