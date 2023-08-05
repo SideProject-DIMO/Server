@@ -3,7 +3,7 @@ const pool = require("../db");
 const express = require("express");
 const router = express.Router();
 
-router.post("/drop", async (req, res, next) => {
+router.post("/", async (req, res, next) => {
   const {user_id, drop_reason} = req.body;
   let result_code = 404;
   let message = "에러가 발생했습니다";

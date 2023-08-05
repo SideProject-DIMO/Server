@@ -15,9 +15,9 @@ app.use("/signup", require("./routes/dimo_signup.js"));
 
 //로그인&로그아웃&탈퇴
 app.use("/social", require("./routes/social_login.js"));
-app.post("/login", require("./routes/standard_login.js"));
-app.get("/logout", require("./routes/logout"));
-app.post("/drop", require("./routes/drop.js"));
+app.use("/login", require("./routes/standard_login.js"));
+app.use("/logout", require("./routes/logout"));
+app.use("/drop", require("./routes/drop.js"));
 
 //회원정보변경
 app.use("/user_info", require("./routes/change_user_info"));
