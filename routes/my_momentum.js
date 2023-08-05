@@ -188,4 +188,33 @@ router.get("/review", async (req, res, next) => {
   }
 });
 
+//투표 완료한 캐릭터 조회
+router.get("/voted_character", async (req, res, next) => {
+  const {user_id} = req.query;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+  try {
+    const [is_voted] = await pool.execute(
+      `SELECT * FROM anime_character_vote JOIN anime_character ON anime_character_vote.character_id = anime_character.character_id WHERE user_id = ? ORDER BY vote_id DESC`,
+      [user_id]
+    );
+    if (is_voted[0] == null) {
+      result_code = 201;
+      message = "투표한 캐릭터가 없습니다.";
+    } else {
+      result_code = 200;
+      message = "투표한 캐릭터를 조회했습니다.";
+    }
+
+    return res.json({
+      code: result_code,
+      message: message,
+      voted_character: is_voted,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(err);
+  }
+});
+
 module.exports = router;
