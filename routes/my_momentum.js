@@ -137,7 +137,7 @@ router.get("/comment", async (req, res, next) => {
   let message = "에러가 발생했습니다.";
   try {
     const [my_comment] = await pool.execute(
-      `SELECT * FROM review_comment WHERE user_id = ?`,
+      `SELECT * FROM review_comment JOIN anime_character ON review_comment.character_id = anime_character.character_id WHERE user_id = ?`,
       [user_id]
     );
     if (my_comment[0] == null) {
@@ -159,14 +159,14 @@ router.get("/comment", async (req, res, next) => {
   }
 });
 
-//내가 쓴 댓글 조회하기
+//내가 쓴 리뷰 조회하기
 router.get("/review", async (req, res, next) => {
   const {user_id} = req.query;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
     const [my_review] = await pool.execute(
-      `SELECT * FROM character_review WHERE user_id = ?`,
+      `SELECT * FROM character_review JOIN anime_character ON character_review.character_id = anime_character.character_id WHERE user_id = ?`,
       [user_id]
     );
     if (my_review[0] == null) {
@@ -181,6 +181,35 @@ router.get("/review", async (req, res, next) => {
       code: result_code,
       message: message,
       review: my_review,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(err);
+  }
+});
+
+//투표 완료한 캐릭터 조회
+router.get("/voted_character", async (req, res, next) => {
+  const {user_id} = req.query;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+  try {
+    const [is_voted] = await pool.execute(
+      `SELECT * FROM anime_character_vote JOIN anime_character ON anime_character_vote.character_id = anime_character.character_id WHERE user_id = ? ORDER BY vote_id DESC`,
+      [user_id]
+    );
+    if (is_voted[0] == null) {
+      result_code = 201;
+      message = "투표한 캐릭터가 없습니다.";
+    } else {
+      result_code = 200;
+      message = "투표한 캐릭터를 조회했습니다.";
+    }
+
+    return res.json({
+      code: result_code,
+      message: message,
+      voted_character: is_voted,
     });
   } catch (err) {
     console.error(err);
