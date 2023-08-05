@@ -363,4 +363,74 @@ router.delete("/delete_comment", async (req, res, next) => {
   }
 });
 
+router.post("/like_comment", async (req, res, next) => {
+  //댓글에 좋아요 누르기
+  const {user_id, character_id, comment_id} = req.body;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+  try {
+    let [is_like] = await pool.execute(
+      `SELECT * FROM comment_like WHERE user_id = ? and comment_id = ?`,
+      [user_id, character_id]
+    );
+
+    if (is_like[0] == null) {
+      await pool.execute(
+        `INSERT INTO comment_like (character_id, user_id, comment_id) VALUES (?, ?, ?)`,
+        [character_id, user_id, comment_id]
+      );
+      await pool.execute(
+        `UPDATE review_comment SET comment_like = comment_like + 1 WHERE comment_id = ?`,
+        [comment_id]
+      );
+      result_code = 200;
+      message = "좋아요를 눌렀습니다.";
+    } else {
+      result_code = 201;
+      message = "이미 좋아요를 누른 댓글입니다.";
+    }
+
+    return res.json({
+      code: result_code,
+      message: message,
+      user_id: user_id,
+      character_id: character_id,
+      comment_id: comment_id,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(error);
+  }
+});
+
+router.post("/dislike_comment", async (req, res, next) => {
+  //댓글에 좋아요 취소하기
+  const {user_id, character_id, comment_id} = req.body;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+  try {
+    await pool.execute(
+      `DELETE FROM comment_like WHERE comment_id = ? and user_id = ?`,
+      [comment_id, user_id]
+    );
+    await pool.execute(
+      `UPDATE review_comment SET comment_like = comment_like - 1 WHERE comment_id = ?`,
+      [comment_id]
+    );
+    result_code = 200;
+    message = "좋아요를 취소했습니다.";
+
+    return res.json({
+      code: result_code,
+      message: message,
+      user_id: user_id,
+      character_id: character_id,
+      comment_id: comment_id,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(error);
+  }
+});
+
 module.exports = router;
