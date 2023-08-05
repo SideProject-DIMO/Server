@@ -59,6 +59,12 @@ router.get("/review_detail", async (req, res, next) => {
       [review_id]
     );
 
+    let [is_liked] = await pool.execute(
+      `SELECT * FROM review_like WHERE review_id = ? and user_id = ?`,
+      [review_id, user_id]
+    );
+    if (is_liked[0] == null) is_liked = "";
+
     view_review.comment_count = comment_count[0].count;
 
     result_code = 200;
@@ -69,6 +75,7 @@ router.get("/review_detail", async (req, res, next) => {
       user_id: user_id,
       character_id: character_id,
       review_list: view_review,
+      is_liked: is_liked, //좋아요 누른 리뷰인지
     });
   } catch (err) {
     console.error(err);
@@ -237,11 +244,23 @@ router.get("/comment", async (req, res, next) => {
   const {user_id, review_id} = req.query;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
+  let [is_liked] = "";
+
   try {
     let [view_comment] = await pool.execute(
       `SELECT * FROM review_comment WHERE review_id = ?`,
       [review_id]
     );
+
+    for (let comment of view_comment) {
+      [is_liked] = await pool.execute(
+        `SELECT * FROM comment_like WHERE user_id = ? and comment_id = ?`,
+        [user_id, comment.comment_id]
+      );
+      if (is_liked[0] == null) comment.is_liked = "";
+      else comment.is_liked = is_liked[0];
+    }
+
     result_code = 200;
     message = "리뷰를 조회했습니다.";
     return res.json({
