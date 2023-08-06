@@ -17,6 +17,7 @@ router.post("/", async (req, res, next) => {
     phone_number,
     nickname,
     mbti,
+    push_check,
   } = req.body;
   const password_bcrypt = bcrypt.hashSync(password, 10); // sync
   let resultCode = 404;
@@ -41,7 +42,7 @@ router.post("/", async (req, res, next) => {
   try {
     //문제 없으면 try문 실행
     const [data] = await pool.execute(
-      "INSERT INTO user (user_id, password, name, sns_type, agency, phone_number, nickname, mbti, refresh_token) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      "INSERT INTO user (user_id, password, name, sns_type, agency, phone_number, nickname, mbti, refresh_token, push_check) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [
         user_id,
         password_bcrypt,
@@ -52,6 +53,7 @@ router.post("/", async (req, res, next) => {
         nickname,
         mbti,
         refresh_token,
+        push_check,
       ]
     );
     resultCode = 200;

@@ -5,12 +5,14 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 router.post("/", async (req, res, next) => {
-  const {user_id, nickname, mbti} = req.body;
+  const {user_id, push_check, nickname, mbti} = req.body;
   let resultCode = 404;
   let message = "에러가 발생했습니다.";
   try {
-    console.log(nickname);
-    console.log(mbti);
+    await pool.execute(`UPDATE user SET push_check = ? WHERE user_id = ?`, [
+      push_check,
+      user_id,
+    ]);
     let [insert_mbti] = await pool.execute(
       `UPDATE user SET nickname =?, mbti =? WHERE user_id =?`,
       [nickname, mbti, user_id]
