@@ -5,6 +5,7 @@ const router = express.Router();
 const axios = require("axios");
 require("dotenv").config();
 
+//찜하기
 router.post("/like", async (req, res, next) => {
   const {user_id, content_type, contentId} = req.body;
   let result_code = 404;
@@ -27,6 +28,7 @@ router.post("/like", async (req, res, next) => {
   }
 });
 
+//찜하기 취소
 router.post("/dislike", async (req, res, next) => {
   const {user_id, content_type, contentId} = req.body;
   let result_code = 404;
@@ -49,7 +51,7 @@ router.post("/dislike", async (req, res, next) => {
   }
 });
 
-//좋아요 상태 확인
+//찜 상태 확인
 router.get("/is_like", async (req, res, next) => {
   const {user_id, content_type, contentId} = req.query;
   let result_code = 404;
@@ -71,6 +73,32 @@ router.get("/is_like", async (req, res, next) => {
       code: result_code,
       message: message,
       user_id: user_id,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(err);
+  }
+});
+
+//가장 찜 많이 한 mbti 보이기
+router.get("/most_like", async (req, res, next) => {
+  const {user_id, content_type, contentId} = req.query;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+  try {
+    let [most_mbti] = await pool.execute(
+      `SELECT mbti, COUNT(*) AS count FROM dimo_like JOIN user ON dimo_like.user_id = user.user_id WHERE content_id = ? GROUP BY mbti ORDER BY count DESC LIMIT 1`,
+      [contentId]
+    );
+
+    result_code = 200;
+    message = "가장 찜을 많이 누른 mbti를 조회했습니다.";
+
+    return res.json({
+      code: result_code,
+      message: message,
+      user_id: user_id,
+      most_mbti: most_mbti[0].mbti,
     });
   } catch (err) {
     console.error(err);
@@ -185,15 +213,20 @@ router.get("/is_like", async (req, res, next) => {
 //   }
 // });
 
-// mbti별 평점 TOP3 조회하기
+// mbti별 좋아요 TOP3 조회하기
 router.get("/mbti_grade", async (req, res, next) => {
   const {contentId, content_type} = req.query;
   let result_code = 400;
   let message = "에러가 발생했습니다.";
   try {
+    // const [mbti_grade] = await pool.execute(
+    //   `SELECT * FROM dimo_grade_avg WHERE content_id = ? and content_type = ? ORDER BY mbti_grade_avg DESC LIMIT 3`,
+    //   [contentId, content_type]
+    // );
+
     const [mbti_grade] = await pool.execute(
-      `SELECT * FROM dimo_grade_avg WHERE content_id = ? and content_type = ? ORDER BY mbti_grade_avg DESC LIMIT 3`,
-      [contentId, content_type]
+      `SELECT *, COUNT(*) AS count FROM dimo_like WHERE content_id = ? and content_type = ? GROUP BY like_id ORDER BY count DESC LIMIT 3`,
+      [contentId, content_type] //mbti를 기준으로 .. 더 추가해야돼
     );
 
     result_code = 200;
@@ -326,7 +359,9 @@ router.get("/moviedata/:movie_id", async (req, res) => {
 
     res.json(await getMovieInfo(movie_id));
   } catch (error) {
-    res.status(500).json({error: error.message});
+    res.status(500).json({
+      error: error.message,
+    });
   }
 });
 
