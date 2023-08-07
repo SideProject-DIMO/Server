@@ -202,6 +202,77 @@ router.post("/kakao_login", async (req, res, next) => {
   }
 });
 
+router.post("/apple_login", async (req, res, next) => {
+  const {user_id, name, sns_type} = req.body;
+
+  let resultCode = 404;
+  let message = "에러가 발생했습니다.";
+  let refresh_token, access_token;
+
+  try {
+    let [data] = await pool.execute("SELECT * FROM user WHERE user_id = ?", [
+      user_id,
+    ]);
+
+    access_token = await jwt.sign(
+      {
+        user_id: user_id,
+        name: name,
+      },
+      process.env.jwt_secret,
+      {
+        expiresIn: "1h",
+      } //만료 시간 1시간
+    );
+
+    refresh_token = await jwt.sign(
+      {
+        user_id: user_id,
+      },
+      process.env.jwt_secret,
+      {
+        expiresIn: "14d",
+      }
+    );
+
+    res.cookie("access_token", access_token, {
+      httpOnly: true,
+      maxAge: 60000 * 60,
+    });
+
+    res.cookie("refresh_token", refresh_token, {
+      httpOnly: true,
+      maxAge: 60000 * 60 * 24 * 14,
+    });
+    if (data[0] == undefined) {
+      data = await pool.execute(
+        "INSERT INTO user (user_id, name, sns_type, refresh_token) VALUES (?, ?, ?, ?)",
+        [user_id, name, sns_type, refresh_token]
+      );
+      resultCode = 200;
+      message = "애플 계정 회원가입 성공!";
+    } else {
+      //로그인
+      let [data2] = await pool.execute(
+        "UPDATE user SET refresh_token=? WHERE user_id = ?",
+        [refresh_token, user_id]
+      );
+      resultCode = 200;
+      message = data[0].name + "님 환영합니다!";
+    }
+    res.json({
+      code: resultCode,
+      message: message,
+      user_id: user_id,
+      access_token: access_token,
+      refresh_token: refresh_token,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(err);
+  }
+});
+
 const get_cookies = (req) => {
   if (req.headers.cookie) {
     let cookies = {};
