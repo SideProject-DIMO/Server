@@ -167,7 +167,7 @@ router.get("/recommend", async (req, res, next) => {
   }
 });
 
-router.get("/search", async (req, res, next) => {
+router.get("/search_character", async (req, res, next) => {
   //검색하기
   let {user_id, search_content} = req.query;
   let result_code = 404;
@@ -175,9 +175,20 @@ router.get("/search", async (req, res, next) => {
   try {
     search_content = "%" + search_content + "%";
     let [search_res] = await pool.execute(
-      `SELECT * FROM anime_character WHERE character_name LIKE ?`,
+      `SELECT character_id, anime_character.anime_id, character_img, character_name, character_mbti, title FROM anime_character JOIN anime_contents ON anime_contents.anime_id = anime_character.anime_id WHERE character_name LIKE ?`,
       [search_content]
     );
+
+    if (search_res[0] == null) {
+      result_code = 201;
+      message = "검색 결과가 없음";
+      return res.json({
+        code: result_code,
+        message: message,
+        user_id: user_id,
+        result: search_res,
+      });
+    }
 
     for (let res of search_res) {
       let [is_vote] = await pool.execute(
@@ -185,15 +196,66 @@ router.get("/search", async (req, res, next) => {
         [user_id, res.character_id]
       );
       if (is_vote[0] != null) {
-        console.log(is_vote[0]);
         res.is_vote = 1;
       } else {
         res.is_vote = 0;
       }
+      //여기는 다 anime니까
+      res.category = "anime";
     }
 
     result_code = 200;
     message = "캐릭터 검색 성공";
+    return res.json({
+      code: result_code,
+      message: message,
+      user_id: user_id,
+      result: search_res,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(error);
+  }
+});
+
+router.get("/search_content", async (req, res, next) => {
+  //검색하기
+  let {user_id, search_content} = req.query;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+  try {
+    search_content = "%" + search_content + "%";
+    let [search_res] = await pool.execute(
+      `SELECT character_id, anime_contents.anime_id, character_img, character_name, character_mbti, title FROM anime_contents JOIN anime_character ON anime_contents.anime_id = anime_character.anime_id WHERE title LIKE ?`,
+      [search_content]
+    );
+
+    if (search_res[0] == null) {
+      result_code = 201;
+      message = "검색 결과가 없음";
+      return res.json({
+        code: result_code,
+        message: message,
+        user_id: user_id,
+        result: search_res,
+      });
+    }
+
+    for (let res of search_res) {
+      let [is_vote] = await pool.execute(
+        `SELECT * FROM anime_character_vote WHERE user_id = ? and character_id = ?`,
+        [user_id, res.character_id]
+      );
+      if (is_vote[0] != null) {
+        res.is_vote = 1;
+      } else {
+        res.is_vote = 0;
+      }
+      res.category = "anime";
+    }
+
+    result_code = 200;
+    message = "작품명 검색 성공";
     return res.json({
       code: result_code,
       message: message,

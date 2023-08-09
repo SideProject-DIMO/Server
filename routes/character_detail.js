@@ -50,7 +50,7 @@ router.get("/review_detail", async (req, res, next) => {
       [review_id]
     );
     let [view_review] = await pool.execute(
-      `SELECT review_id, user.user_id, character_id, review_content, review_like, review_hits, review_spoiler, nickname, mbti, profile_img FROM character_review JOIN user ON character_review.user_id = user.user_id WHERE review_id = ?`,
+      `SELECT review_id, user.user_id, anime_character.character_id, review_content, review_like, review_hits, review_spoiler, nickname, mbti, profile_img, character_name, title, character_mbti FROM character_review JOIN user ON character_review.user_id = user.user_id JOIN anime_character ON character_review.character_id = anime_character.character_id JOIN anime_contents ON anime_character.anime_id = anime_contents.anime_id WHERE review_id = ?`,
       [review_id]
     );
 
@@ -65,7 +65,8 @@ router.get("/review_detail", async (req, res, next) => {
     );
     if (is_liked[0] == null) is_liked = "";
 
-    view_review.comment_count = comment_count[0].count;
+    view_review[0].comment_count =
+      comment_count[0] != null ? comment_count[0].count : 0;
 
     result_code = 200;
     message = "상세 리뷰를 조회했습니다.";
