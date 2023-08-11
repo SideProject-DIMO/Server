@@ -142,14 +142,37 @@ router.get("/recommend", async (req, res, next) => {
         `SELECT character_id, anime_character.anime_id, character_name, character_img, character_mbti, title FROM anime_character JOIN anime_contents ON anime_character.anime_id = anime_contents.anime_id ORDER BY rand() LIMIT 300`
       );
       // random_sorted_arr = randomSort(rand_char);
+      for (let rand of rand_char) {
+        let [is_vote] = await pool.execute(
+          `SELECT * FROM anime_character_vote WHERE character_id = ? and user_id = ?`,
+          [rand.character_id, user_id]
+        );
+        if (is_vote[0] == null) {
+          rand.is_vote = 0;
+        } else {
+          rand.is_vote = 1;
+        }
+      }
 
       result_code = 200;
       message = "캐릭터 랜덤 추천 성공";
     } else {
       //인기순
       [pop_char] = await pool.execute(
-        `SELECT DISTINCT anime_character_vote.character_id, content_id, character_name, character_img, character_mbti, title FROM anime_character_vote JOIN anime_character ON anime_character.character_id = anime_character_vote.character_id JOIN anime_contents ON anime_contents.anime_id = anime_character.anime_id ORDER BY anime_character_vote.character_id DESC;`
+        `SELECT anime_character_vote.character_id, content_id, character_name, character_img, character_mbti, title, COUNT(*) AS count FROM anime_character_vote JOIN anime_character ON anime_character.character_id = anime_character_vote.character_id JOIN anime_contents ON anime_contents.anime_id = anime_character.anime_id GROUP BY anime_character_vote.character_id ORDER BY count DESC;`
       );
+
+      for (let pop of pop_char) {
+        let [is_vote] = await pool.execute(
+          `SELECT * FROM anime_character_vote WHERE character_id = ? and user_id = ?`,
+          [pop.character_id, user_id]
+        );
+        if (is_vote[0] == null) {
+          pop.is_vote = 0;
+        } else {
+          pop.is_vote = 1;
+        }
+      }
 
       result_code = 200;
       message = "캐릭터 인기순 추천 성공";
