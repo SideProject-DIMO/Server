@@ -81,6 +81,7 @@ CREATE TABLE `dimo_grade` (
   `content_id` int(11) NOT NULL,
   `content_type` varchar(10) NOT NULL,
   `grade` int(11) DEFAULT '0',
+  `user_mbti` varchar(5) NOT NULL,
   PRIMARY KEY (`grade_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
