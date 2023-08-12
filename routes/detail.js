@@ -157,19 +157,40 @@ router.get("/mbti_result", async (req, res, next) => {
   let result_code = 400;
   let message = "에러가 발생했습니다.";
   try {
-    const [mbti_result] = await pool.execute(
-      `SELECT *, COUNT(*) AS count FROM dimo_like WHERE content_id = ? and content_type = ? GROUP BY like_id ORDER BY count DESC LIMIT 3`,
-      [contentId, content_type] //mbti를 기준으로 .. 더 추가해야돼
+    let [grade_best] = await pool.execute(
+      `SELECT user_mbti, COUNT(*) AS count FROM dimo_grade WHERE content_id = ? and content_type = ? and grade = 1 GROUP BY user_mbti ORDER BY count DESC LIMIT 1`,
+      [contentId, content_type]
     );
 
-    result_code = 200;
-    message = "가장 좋아한 MBTI는 " + "이고, 가장 싫어한 MBTI는 " + "입니다.";
+    let [grade_worst] = await pool.execute(
+      `SELECT user_mbti, COUNT(*) AS count FROM dimo_grade WHERE content_id = ? and content_type = ? and grade = -1 GROUP BY user_mbti ORDER BY count DESC LIMIT 1`,
+      [contentId, content_type]
+    );
+
+    if (grade_best[0] == null) {
+      grade_best = "존재하지 않음";
+      result_code = 201;
+      message = "가장 좋아한 MBTI는 존재하지 않고,";
+    } else {
+      grade_best = grade_best[0].user_mbti;
+      result_code = 200;
+      message = "가장 좋아한 MBTI는 " + grade_best + "이고 ";
+    }
+
+    if (grade_worst[0] == null) {
+      grade_worst = "존재하지 않음";
+      result_code += 1;
+      message += "가장 안좋아한 MBTI는 존재하지 않습니다.";
+    } else {
+      grade_worst = grade_worst[0].user_mbti;
+      message += "가장 안좋아한 MBTI는 " + grade_worst + "입니다 ";
+    }
 
     return res.json({
-      code: result_code,
+      code: result_code, //가장 좋아한 mbti와 좋아하지 않는 mbti가 모두 없다면 202, 한 쪽만 있다면 201, 둘 다 있다면 200
       message: message,
-      user_id: user_id,
-      mbti_result: mbti_result,
+      grade_best: grade_best,
+      grade_worst: grade_worst,
       content_type: content_type,
       contentId: contentId,
     });
