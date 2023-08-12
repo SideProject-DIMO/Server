@@ -308,6 +308,19 @@ router.get("/another_character", async (req, res, next) => {
       [content[0].anime_id]
     );
 
+    for (let an of another_character) {
+      let [is_vote] = await pool.execute(
+        `SELECT * FROM anime_character_vote WHERE user_id = ? and character_id = ?`,
+        [user_id, an.character_id]
+      );
+
+      if (is_vote[0] == null) {
+        an.is_vote = 0;
+      } else {
+        an.is_vote = 1;
+      }
+    }
+
     result_code = 200;
     message = "같은 작품 내 다른 캐릭터 조회 성공";
     return res.json({
