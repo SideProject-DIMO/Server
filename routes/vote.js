@@ -304,7 +304,7 @@ router.get("/another_character", async (req, res, next) => {
     );
 
     let [another_character] = await pool.execute(
-      `SELECT * FROM anime_character WHERE anime_id = ?`,
+      `SELECT character_id, anime_contents.anime_id, character_img, character_name, character_mbti, title FROM anime_character JOIN anime_contents ON anime_contents.anime_id = anime_character.anime_id WHERE anime_contents.anime_id = ?`,
       [content[0].anime_id]
     );
 

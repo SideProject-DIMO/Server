@@ -80,19 +80,8 @@ CREATE TABLE `dimo_grade` (
   `user_id` varchar(30) NOT NULL,
   `content_id` int(11) NOT NULL,
   `content_type` varchar(10) NOT NULL,
-  `grade` float NOT NULL,
+  `grade` int(11) DEFAULT '0',
   PRIMARY KEY (`grade_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- 평점 평균
-CREATE TABLE `dimo_grade_avg` (
-  `content_id` int(11) NOT NULL,
-  `mbti` varchar(5) NOT NULL,
-  `mbti_grade_avg` float DEFAULT NULL,
-  `content_type` varchar(10) NOT NULL,
-  `avg_people` int(11) DEFAULT '0',
-  `mbti_grade_sum` float DEFAULT NULL,
-  PRIMARY KEY (`content_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- 애니메이션 캐릭터 투표
