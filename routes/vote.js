@@ -20,8 +20,18 @@ router.post("/", async (req, res, next) => {
       );
 
       await pool.execute(
-        `INSERT INTO anime_character_vote(character_id, user_mbti, user_id, energy, recognization, prediction, reaction, content_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        [character_id, my_mbti[0].mbti, user_id, ei, sn, tf, jp, content_id]
+        `INSERT INTO anime_character_vote(character_id, user_mbti, user_id, energy, recognization, prediction, reaction, content_id, vote_mbti) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          character_id,
+          my_mbti[0].mbti,
+          user_id,
+          ei,
+          sn,
+          tf,
+          jp,
+          content_id,
+          ei + sn + tf + jp,
+        ]
       );
 
       [first] = await pool.execute(
@@ -284,6 +294,92 @@ router.get("/search_content", async (req, res, next) => {
       message: message,
       user_id: user_id,
       result: search_res,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(error);
+  }
+});
+
+router.get("/view_result", async (req, res, next) => {
+  //투표 결과 확인하기
+  let {user_id, character_id} = req.query;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+  try {
+    let [is_vote] = await pool.execute(
+      `SELECT * FROM anime_character_vote WHERE user_id = ? and character_id = ?`,
+      [user_id, character_id]
+    );
+
+    let percent = 0;
+    let my_vote_mbti = null;
+
+    let [count] = await pool.execute(
+      `SELECT COUNT(*) AS count FROM anime_character_vote WHERE character_id = ?`,
+      [character_id]
+    );
+
+    if (is_vote[0] == null) {
+      //나와 동일하게 투표한 사람 퍼센트 보내지 않기
+      result_code = 201;
+      message = "아직 투표하지 않은 캐릭터입니다.";
+    } else {
+      //나와 동일하게 투표한 사람 퍼센트 보내기
+      let [same_choose] = await pool.execute(
+        `SELECT COUNT(*) AS count FROM anime_character_vote WHERE energy = ? and recognization = ? and prediction = ? and reaction = ? and character_id = ?`,
+        [
+          is_vote[0].energy,
+          is_vote[0].recognization,
+          is_vote[0].prediction,
+          is_vote[0].reaction,
+          character_id,
+        ]
+      );
+
+      percent = Math.round((same_choose[0].count / count[0].count) * 100);
+      my_vote_mbti =
+        is_vote[0].energy +
+        is_vote[0].recognization +
+        is_vote[0].prediction +
+        is_vote[0].reaction;
+      result_code = 200;
+      message = "나랑 동일하게 투표한 사람 비율을 조회했습니다.";
+    }
+
+    //mbti top3 투표율 및 가장 많은 사람이 투표한 mbti
+    let [top3] = await pool.execute(
+      `SELECT vote_mbti, COUNT(*) AS count
+                FROM anime_character_vote
+                WHERE character_id = ?
+                GROUP BY vote_mbti
+                ORDER BY count DESC
+                LIMIT 3`,
+      [character_id]
+    );
+
+    let [info] = await pool.execute(
+      `SELECT anime_character.anime_id, title, anime_character.character_id, character_name, character_img, character_mbti FROM anime_character JOIN anime_contents ON anime_character.anime_id = anime_contents.anime_id WHERE anime_character.character_id = ?`,
+      [character_id]
+    );
+
+    first = top3[0].vote_mbti;
+    second = top3[1].vote_mbti;
+    third = top3[2].vote_mbti;
+
+    top3_mbti = {
+      first: [first, Math.round((top3[0].count / count[0].count) * 100)],
+      second: [second, Math.round((top3[1].count / count[0].count) * 100)],
+      third: [third, Math.round((top3[2].count / count[0].count) * 100)],
+    };
+
+    return res.json({
+      code: result_code,
+      message: message,
+      character_info: info[0],
+      my_vote_mbti: my_vote_mbti,
+      my_vote_mbti_percent: percent,
+      top3_mbti: top3_mbti,
     });
   } catch (err) {
     console.error(err);
