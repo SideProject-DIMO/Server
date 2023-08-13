@@ -368,9 +368,24 @@ router.get("/view_result", async (req, res, next) => {
     third = top3[2].vote_mbti;
 
     top3_mbti = {
-      first: [first, Math.round((top3[0].count / count[0].count) * 100)],
-      second: [second, Math.round((top3[1].count / count[0].count) * 100)],
-      third: [third, Math.round((top3[2].count / count[0].count) * 100)],
+      first: [
+        {
+          mbti: first,
+          percent: Math.round((top3[0].count / count[0].count) * 100),
+        },
+      ],
+      second: [
+        {
+          mbti: second,
+          percent: Math.round((top3[1].count / count[0].count) * 100),
+        },
+      ],
+      third: [
+        {
+          mbti: third,
+          percent: Math.round((top3[2].count / count[0].count) * 100),
+        },
+      ],
     };
 
     return res.json({
