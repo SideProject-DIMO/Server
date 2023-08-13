@@ -87,15 +87,16 @@ CREATE TABLE `dimo_grade` (
 
 -- 애니메이션 캐릭터 투표
 CREATE TABLE `anime_character_vote` (
-  `vote_id` int NOT NULL AUTO_INCREMENT,
-  `character_id` int NOT NULL,
+  `vote_id` int(11) NOT NULL AUTO_INCREMENT,
+  `character_id` int(11) NOT NULL,
   `user_mbti` varchar(4) NOT NULL,
   `user_id` varchar(30) NOT NULL,
   `energy` varchar(1) NOT NULL,
   `recognization` varchar(1) NOT NULL,
   `prediction` varchar(1) NOT NULL,
   `reaction` varchar(1) NOT NULL,
-  `content_id` int NOT NULL,
+  `content_id` int(11) NOT NULL,
+  `vote_mbti` varchar(5) NOT NULL,
   PRIMARY KEY (`vote_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
