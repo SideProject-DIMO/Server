@@ -1,7 +1,11 @@
 const express = require("express");
 const app = express();
 let bodyParser = require("body-parser");
-const {route} = require("./routes/vote.js");
+const multer = require("multer");
+
+const upload = multer({
+  dest: __dirname + "/uploads/", // 이미지 업로드 경로
+});
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
@@ -39,6 +43,9 @@ app.use("/vote", require("./routes/vote.js"));
 
 //나의 모멘텀 조회
 app.use("/my_momentum", require("./routes/my_momentum.js"));
+
+//설정
+app.use("/admin", require("./routes/admin.js"));
 
 app.use(require("./routes/auth_middleware"));
 
