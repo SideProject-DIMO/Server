@@ -149,3 +149,12 @@ CREATE TABLE `comment_like` (
   `review_id` int(11) NOT NULL,
   PRIMARY KEY (`comment_like_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- 캐릭터 요청하기
+CREATE TABLE `request_character` (
+  `request_id` int(11) NOT NULL AUTO_INCREMENT,
+  `category` varchar(3) NOT NULL,
+  `title` varchar(50) NOT NULL,
+  `character_name` varchar(100) NOT NULL,
+  PRIMARY KEY (`request_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8mb4_general_ci;
