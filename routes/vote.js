@@ -4,7 +4,7 @@ const router = express.Router();
 
 router.post("/", async (req, res, next) => {
   //투표하기
-  const {user_id, content_id, character_id, ei, sn, tf, jp} = req.body;
+  const {user_id, contentId, character_id, ei, sn, tf, jp} = req.body;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
@@ -29,7 +29,7 @@ router.post("/", async (req, res, next) => {
           sn,
           tf,
           jp,
-          content_id,
+          contentId,
           ei + sn + tf + jp,
         ]
       );
@@ -302,7 +302,7 @@ router.get("/search_content", async (req, res, next) => {
 });
 
 router.get("/view_result", async (req, res, next) => {
-  //투표 결과 확인하기
+  //캐릭터 분석 확인하기
   let {user_id, character_id} = req.query;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
