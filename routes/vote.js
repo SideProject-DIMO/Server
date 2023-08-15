@@ -92,7 +92,7 @@ router.post("/", async (req, res, next) => {
 
       let [title] = await pool.execute(
         `SELECT title FROM anime_contents WHERE anime_id = ?`,
-        [content_id]
+        [contentId]
       );
 
       mbti = {
@@ -105,7 +105,7 @@ router.post("/", async (req, res, next) => {
       return res.json({
         code: result_code,
         message: message,
-        contentId: content_id,
+        contentId: contentId,
         content_title: title[0].title,
         character_id: character_id,
         character_mbti: character_mbti,
@@ -120,6 +120,261 @@ router.post("/", async (req, res, next) => {
         message: message,
       });
     }
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(error);
+  }
+});
+
+router.get("/", async (req, res, next) => {
+  //투표 결과 조회하기
+  const {user_id, character_id} = req.query;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+  try {
+    let [content_info] = "";
+    let [same_choose] = "";
+    let [is_vote] = await pool.execute(
+      `SELECT * FROM anime_character_vote WHERE user_id = ? and character_id = ?`,
+      [user_id, character_id]
+    );
+    [content_info] = await pool.execute(
+      `SELECT title, character_img, character_name, character_mbti FROM anime_character JOIN anime_contents ON anime_contents.anime_id = anime_character.anime_id WHERE character_id = ? `,
+      [character_id]
+    );
+
+    [first] = await pool.execute(
+      `SELECT energy, COUNT(*) AS count
+                  FROM anime_character_vote
+                  WHERE energy IN ('E', 'I') and character_id = ?
+                  GROUP BY energy
+                  ORDER BY count DESC
+                  LIMIT 1`,
+      [character_id]
+    );
+    [second] = await pool.execute(
+      `SELECT recognization, COUNT(*) AS count
+                  FROM anime_character_vote
+                  WHERE recognization IN ('S', 'N') and character_id = ?
+                  GROUP BY recognization
+                  ORDER BY count DESC
+                  LIMIT 1`,
+      [character_id]
+    );
+    [third] = await pool.execute(
+      `SELECT prediction, COUNT(*) AS count
+                  FROM anime_character_vote
+                  WHERE prediction IN ('T', 'F') and character_id = ?
+                  GROUP BY prediction
+                  ORDER BY count DESC
+                  LIMIT 1`,
+      [character_id]
+    );
+    [fourth] = await pool.execute(
+      `SELECT reaction, COUNT(*) AS count
+                  FROM anime_character_vote
+                  WHERE reaction IN ('J', 'P') and character_id = ?
+                  GROUP BY reaction
+                  ORDER BY count DESC
+                  LIMIT 1`,
+      [character_id]
+    );
+
+    let [count] = await pool.execute(
+      `SELECT COUNT(*) AS count FROM anime_character_vote WHERE character_id = ?`,
+      [character_id]
+    );
+
+    mbti = [
+      {
+        mbti: first[0].energy,
+        ei: Math.round((first[0].count / count[0].count) * 100),
+      },
+      {
+        mbti: second[0].recognization,
+        sn: Math.round((second[0].count / count[0].count) * 100),
+      },
+      {
+        mbti: third[0].prediction,
+        tf: Math.round((third[0].count / count[0].count) * 100),
+      },
+      {
+        mbti: fourth[0].reaction,
+        jp: Math.round((fourth[0].count / count[0].count) * 100),
+      },
+    ];
+
+    if (is_vote[0] != null) {
+      //나랑 동일한 mbti 고른 사람 비율
+      [same_choose] = await pool.execute(
+        `SELECT COUNT(*) AS count FROM anime_character_vote WHERE energy = ? and recognization = ? and prediction = ? and reaction = ? and character_id = ?`,
+        [
+          is_vote[0].energy,
+          is_vote[0].recognization,
+          is_vote[0].prediction,
+          is_vote[0].reaction,
+          character_id,
+        ]
+      );
+
+      percent = Math.round((same_choose[0].count / count[0].count) * 100);
+      my_vote_mbti =
+        is_vote[0].energy +
+        is_vote[0].recognization +
+        is_vote[0].prediction +
+        is_vote[0].reaction;
+
+      result_code = 200;
+      message = "나를 비롯한 투표 결과를 조회했습니다.";
+
+      return res.json({
+        code: result_code,
+        message: message,
+        content_info: content_info[0],
+        character_id: character_id,
+        mbti_percent: mbti,
+        smae_vote_percent: percent,
+        my_vote_mbti: my_vote_mbti,
+      });
+    } else {
+      result_code = 201;
+      message = "사람들의 투표 결과를 조회했습니다.";
+
+      let [most_vote_mbti] = await pool.execute(
+        `SELECT vote_mbti FROM anime_character_vote WHERE character_id = ?`,
+        [character_id]
+      );
+
+      return res.json({
+        code: result_code,
+        message: message,
+        content_info: content_info[0],
+        character_id: character_id,
+        mbti_percent: mbti,
+        most_vote_mbti: most_vote_mbti[0].vote_mbti,
+      });
+    }
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(error);
+  }
+});
+
+router.get("/view_revote", async (req, res, next) => {
+  //재투표 시, 기존 투표한 속성 조회
+  let {user_id, character_id} = req.query;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+
+  try {
+    let [my_vote_result] = await pool.execute(
+      `SELECT energy, recognization, prediction, reaction FROM anime_character_vote WHERE character_id = ? and user_id = ?`,
+      [character_id, user_id]
+    );
+
+    result_code = 200;
+    message = "내가 투표했던 속성 정보를 표시합니다.";
+    return res.json({
+      code: result_code,
+      message: message,
+      user_id: user_id,
+      character_id: character_id,
+      my_vote_result: my_vote_result[0],
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(error);
+  }
+});
+
+router.post("/revote", async (req, res, next) => {
+  //재투표하기
+  const {user_id, contentId, character_id, ei, sn, tf, jp} = req.body;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+  try {
+    await pool.execute(
+      `UPDATE anime_character_vote SET energy = ?, recognization = ?, prediction = ?, reaction = ?, vote_mbti = ? WHERE character_id = ? and user_id = ?`,
+      [ei, sn, tf, jp, ei + sn + tf + jp, character_id, user_id]
+    );
+
+    [first] = await pool.execute(
+      `SELECT energy, COUNT(*) AS count
+                  FROM anime_character_vote
+                  WHERE energy IN ('E', 'I') and character_id = ?
+                  GROUP BY energy
+                  ORDER BY count DESC
+                  LIMIT 1`,
+      [character_id]
+    );
+    [second] = await pool.execute(
+      `SELECT recognization, COUNT(*) AS count
+                  FROM anime_character_vote
+                  WHERE recognization IN ('S', 'N') and character_id = ?
+                  GROUP BY recognization
+                  ORDER BY count DESC
+                  LIMIT 1`,
+      [character_id]
+    );
+    [third] = await pool.execute(
+      `SELECT prediction, COUNT(*) AS count
+                  FROM anime_character_vote
+                  WHERE prediction IN ('T', 'F') and character_id = ?
+                  GROUP BY prediction
+                  ORDER BY count DESC
+                  LIMIT 1`,
+      [character_id]
+    );
+    [fourth] = await pool.execute(
+      `SELECT reaction, COUNT(*) AS count
+                  FROM anime_character_vote
+                  WHERE reaction IN ('J', 'P') and character_id = ?
+                  GROUP BY reaction
+                  ORDER BY count DESC
+                  LIMIT 1`,
+      [character_id]
+    );
+
+    character_mbti =
+      first[0].energy +
+      second[0].recognization +
+      third[0].prediction +
+      fourth[0].reaction;
+
+    result_code = 200;
+    message = "재투표를 완료하였습니다.";
+
+    await pool.execute(
+      `UPDATE anime_character SET character_mbti =  ? WHERE character_id = ?`,
+      [character_mbti, character_id]
+    );
+
+    let [count] = await pool.execute(
+      `SELECT COUNT(*) AS count FROM anime_character_vote WHERE character_id = ?`,
+      [character_id]
+    );
+
+    let [title] = await pool.execute(
+      `SELECT title FROM anime_contents WHERE anime_id = ?`,
+      [contentId]
+    );
+
+    mbti = {
+      ei: Math.round((first[0].count / count[0].count) * 100),
+      sn: Math.round((second[0].count / count[0].count) * 100),
+      tf: Math.round((third[0].count / count[0].count) * 100),
+      jp: Math.round((fourth[0].count / count[0].count) * 100),
+    };
+
+    return res.json({
+      code: result_code,
+      message: message,
+      contentId: contentId,
+      content_title: title[0].title,
+      character_id: character_id,
+      character_mbti: character_mbti,
+      mbti_percent: mbti,
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json(error);
