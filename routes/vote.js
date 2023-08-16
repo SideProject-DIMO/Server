@@ -233,7 +233,7 @@ router.get("/", async (req, res, next) => {
         content_info: content_info[0],
         character_id: character_id,
         mbti_percent: mbti,
-        smae_vote_percent: percent,
+        same_vote_percent: percent,
         my_vote_mbti: my_vote_mbti,
       });
     } else {
