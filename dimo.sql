@@ -168,3 +168,12 @@ CREATE TABLE `report_user` (
   `review_id` int(11) NOT NULL,
   PRIMARY KEY (`report_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8mb4_general_ci;
+
+-- 리뷰 가리기
+CREATE TABLE `blind_review` (
+  `blind_id` int(11) NOT NULL AUTO_INCREMENT,
+  `blind_review_id` int(11) NOT NULL,
+  `blind_user_id` varchar(30) DEFAULT NULL,
+  `user_id` varchar(30) NOT NULL,
+  PRIMARY KEY (`blind_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8mb4_general_ci;
