@@ -434,4 +434,42 @@ router.post("/dislike_comment", async (req, res, next) => {
   }
 });
 
+router.post("/report_user", async (req, res, next) => {
+  //사용자 신고하기
+  const {user_id, review_id, report_reason} = req.body;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+  try {
+    let [report_user_info] = await pool.execute(
+      `SELECT * FROM character_review WHERE review_id = ?`,
+      [review_id]
+    );
+
+    let [report_confirm] = await pool.execute(
+      `SELECT * FROM report_user WHERE user_id = ? and review_id =?`,
+      [user_id, review_id]
+    );
+
+    if (report_confirm[0] == null) {
+      await pool.execute(
+        `INSERT INTO report_user(report_user_id, user_id, report_reason, review_id) VALUES (?, ?, ?, ?)`,
+        [report_user_info[0].user_id, user_id, report_reason, review_id]
+      );
+      result_code = 200;
+      message = "신고했습니다.";
+    } else {
+      result_code = 201;
+      message = "이미 신고한 리뷰입니다.";
+    }
+
+    return res.json({
+      code: result_code,
+      message: message,
+      user_id: user_id,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(error);
+  }
+});
 module.exports = router;
