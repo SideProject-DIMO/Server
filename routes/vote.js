@@ -618,31 +618,79 @@ router.get("/view_result", async (req, res, next) => {
       [character_id]
     );
 
-    first = top3[0].vote_mbti;
-    second = top3[1].vote_mbti;
-    third = top3[2].vote_mbti;
-
-    top3_mbti = {
-      first: [
-        {
+    if (top3.length == 3) {
+      first = top3[0].vote_mbti;
+      second = top3[1].vote_mbti;
+      third = top3[2].vote_mbti;
+      top3_mbti = {
+        first: {
           mbti: first,
           percent: Math.round((top3[0].count / count[0].count) * 100),
         },
-      ],
-      second: [
-        {
+        second: {
           mbti: second,
           percent: Math.round((top3[1].count / count[0].count) * 100),
         },
-      ],
-      third: [
-        {
+        third: {
           mbti: third,
           percent: Math.round((top3[2].count / count[0].count) * 100),
         },
-      ],
-    };
-
+      };
+    } else if (top3.length == 2) {
+      first = top3[0].vote_mbti;
+      second = top3[1].vote_mbti;
+      third = "결과가 없습니다.";
+      top3_mbti = {
+        first: {
+          mbti: first,
+          percent: Math.round((top3[0].count / count[0].count) * 100),
+        },
+        second: {
+          mbti: second,
+          percent: Math.round((top3[1].count / count[0].count) * 100),
+        },
+        third: {
+          mbti: third,
+          percent: 0,
+        },
+      };
+    } else if (top3.length == 1) {
+      first = top3[0].vote_mbti;
+      second = "결과가 없습니다.";
+      third = "결과가 없습니다.";
+      top3_mbti = {
+        first: {
+          mbti: first,
+          percent: Math.round((top3[0].count / count[0].count) * 100),
+        },
+        second: {
+          mbti: second,
+          percent: 0,
+        },
+        third: {
+          mbti: third,
+          percent: 0,
+        },
+      };
+    } else {
+      first = "결과가 없습니다.";
+      second = "결과가 없습니다.";
+      third = "결과가 없습니다.";
+      top3_mbti = {
+        first: {
+          mbti: first,
+          percent: 0,
+        },
+        second: {
+          mbti: second,
+          percent: 0,
+        },
+        third: {
+          mbti: third,
+          percent: 0,
+        },
+      };
+    }
     return res.json({
       code: result_code,
       message: message,
