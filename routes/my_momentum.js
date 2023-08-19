@@ -1,5 +1,7 @@
 const pool = require("../db");
 const express = require("express");
+const multer = require("multer");
+const path = require("path");
 const router = express.Router();
 
 // 내 프로필 조회하기
@@ -33,6 +35,7 @@ router.get("/", async (req, res, next) => {
 
 // 내 프로필 수정하기
 router.post("/mod_profile", async (req, res, next) => {
+  //upload.single("file"),
   const {user_id, profile_img, intro} = req.body;
   let result_code = 404;
   let message = "에러가 발생했습니다";
@@ -195,7 +198,7 @@ router.get("/voted_character", async (req, res, next) => {
   let message = "에러가 발생했습니다.";
   try {
     const [is_voted] = await pool.execute(
-      `SELECT * FROM anime_character_vote JOIN anime_character ON anime_character_vote.character_id = anime_character.character_id WHERE user_id = ? ORDER BY vote_id DESC`,
+      `SELECT vote_id, anime_character.character_id, user_mbti, title, user_id, energy, recognization, prediction, reaction, content_id, character_img, character_name, character_mbti FROM anime_character_vote JOIN anime_character ON anime_character_vote.character_id = anime_character.character_id JOIN anime_contents ON anime_contents.anime_id = anime_character_vote.content_id WHERE user_id = ? ORDER BY vote_id DESC`,
       [user_id]
     );
     if (is_voted[0] == null) {
