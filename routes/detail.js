@@ -151,6 +151,36 @@ router.post("/grade", async (req, res, next) => {
   }
 });
 
+// 평가한 상태 조회하기
+router.get("/is_grade", async (req, res, next) => {
+  const {user_id, content_type, contentId} = req.query;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+  try {
+    let [is_grade] = await pool.execute(
+      `SELECT * FROM dimo_grade WHERE user_id = ? and content_type = ? and content_id = ? `,
+      [user_id, content_type, contentId]
+    );
+
+    if (is_grade[0] == null) {
+      is_grade[0] = "아직 평가 전입니다.";
+    }
+
+    result_code = 200;
+    message = "평가가 되었는지 조회했습니다.";
+
+    return res.json({
+      code: result_code,
+      message: message,
+      user_id: user_id,
+      is_grade: is_grade[0],
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(err);
+  }
+});
+
 // 평가하기 가장 좋아한 MBTI와 가장 좋아하지 않는 MBTI 보이기
 router.get("/mbti_result", async (req, res, next) => {
   const {contentId, content_type} = req.query;
