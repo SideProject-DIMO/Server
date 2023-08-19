@@ -158,3 +158,12 @@ CREATE TABLE `request_character` (
   `character_name` varchar(100) NOT NULL,
   PRIMARY KEY (`request_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8mb4_general_ci;
+
+-- 작성자 신고하기
+CREATE TABLE `report_user` (
+  `report_id` int(11) NOT NULL AUTO_INCREMENT,
+  `report_user_id` varchar(30) NOT NULL,
+  `user_id` varchar(30) NOT NULL,
+  `report_reason` varchar(100) NOT NULL,
+  PRIMARY KEY (`report_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8mb4_general_ci;
