@@ -165,5 +165,6 @@ CREATE TABLE `report_user` (
   `report_user_id` varchar(30) NOT NULL,
   `user_id` varchar(30) NOT NULL,
   `report_reason` varchar(100) NOT NULL,
+  `review_id` int(11) NOT NULL,
   PRIMARY KEY (`report_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8mb4_general_ci;
