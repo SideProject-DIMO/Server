@@ -175,5 +175,6 @@ CREATE TABLE `blind_review` (
   `blind_review_id` int(11) NOT NULL,
   `blind_user_id` varchar(30) DEFAULT NULL,
   `user_id` varchar(30) NOT NULL,
+  `character_id` int(11) NOT NULL,
   PRIMARY KEY (`blind_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8mb4_general_ci;
