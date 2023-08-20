@@ -163,7 +163,7 @@ router.get("/is_grade", async (req, res, next) => {
     );
 
     if (is_grade[0] == null) {
-      is_grade[0] = "아직 평가 전입니다.";
+      is_grade[0] = null;
     }
 
     result_code = 200;

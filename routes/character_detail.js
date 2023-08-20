@@ -434,4 +434,97 @@ router.post("/dislike_comment", async (req, res, next) => {
   }
 });
 
+router.post("/blind_review", async (req, res, next) => {
+  //리뷰 가리기
+  const {user_id, review_id, blind_type} = req.body;
+  //blind_type == 0 이면 하나, 1이면 해당 작성자의 리뷰 전체
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+  try {
+    let [blind_user_info] = await pool.execute(
+      `SELECT * FROM character_review WHERE review_id = ?`,
+      [review_id]
+    );
+
+    if (blind_type == 0) {
+      //리뷰 하나만 가리는 경우
+      await pool.execute(
+        `INSERT INTO blind_review(blind_review_id, blind_user_id, user_id) VALUES(?, ?, ?)`,
+        [review_id, blind_user_info[0].user_id, user_id]
+      );
+      result_code = 200;
+      message = "해당 리뷰를 가렸습니다.";
+    } else {
+      //리뷰 다 가리는 경우
+      let [all_review] = await pool.execute(
+        `SELECT * FROM character_review WHERE BINARY user_id = ?`,
+        [blind_user_info[0].user_id]
+      );
+
+      for (let all of all_review) {
+        let [blind] = await pool.execute(
+          `SELECT * FROM blind_review WHERE blind_review_id = ? and user_id = ?`,
+          [all.review_id, user_id]
+        );
+
+        if (blind[0] == undefined) {
+          await pool.execute(
+            `INSERT INTO blind_review(blind_review_id, blind_user_id, user_id) VALUES(?, ?, ?)`,
+            [all.review_id, all.user_id, user_id]
+          );
+        }
+      }
+      result_code = 200;
+      message = "작성자의 모든 리뷰를 가렸습니다.";
+    }
+
+    return res.json({
+      code: result_code,
+      message: message,
+      user_id: user_id,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(error);
+  }
+});
+
+router.post("/report_user", async (req, res, next) => {
+  //사용자 신고하기
+  const {user_id, review_id, report_reason} = req.body;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+  try {
+    let [report_user_info] = await pool.execute(
+      `SELECT * FROM character_review WHERE review_id = ?`,
+      [review_id]
+    );
+
+    let [report_confirm] = await pool.execute(
+      `SELECT * FROM report_user WHERE user_id = ? and review_id =?`,
+      [user_id, review_id]
+    );
+
+    if (report_confirm[0] == null) {
+      await pool.execute(
+        `INSERT INTO report_user(report_user_id, user_id, report_reason, review_id) VALUES (?, ?, ?, ?)`,
+        [report_user_info[0].user_id, user_id, report_reason, review_id]
+      );
+      result_code = 200;
+      message = "신고했습니다.";
+    } else {
+      result_code = 201;
+      message = "이미 신고한 리뷰입니다.";
+    }
+
+    return res.json({
+      code: result_code,
+      message: message,
+      user_id: user_id,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(error);
+  }
+});
 module.exports = router;
