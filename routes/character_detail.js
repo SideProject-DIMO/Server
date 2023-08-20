@@ -8,10 +8,43 @@ router.get("/", async (req, res, next) => {
   let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
-    let [view_review] = await pool.execute(
+    let include_blind_review = [];
+    // let [view_review] = "";
+    [view_review] = await pool.execute(
       `SELECT review_id, user.user_id, character_id, review_content, review_like, review_hits, review_spoiler, nickname, mbti, profile_img FROM character_review JOIN user ON character_review.user_id = user.user_id WHERE character_id = ?`,
       [character_id]
     );
+    let [blind] = await pool.execute(
+      `SELECT * FROM blind_review WHERE user_id = ? and character_id = ?`,
+      [user_id, character_id]
+    );
+
+    if (blind[0] != null) {
+      for (let bli of blind) {
+        [view_review] = await pool.execute(
+          `SELECT review_id, user.user_id, character_id, review_content, review_like, review_hits, review_spoiler, nickname, mbti, profile_img FROM character_review JOIN user ON character_review.user_id = user.user_id WHERE character_id = ? and review_id = ?`,
+          [character_id, bli.blind_review_id]
+        );
+        include_blind_review.push(view_review[0]);
+      }
+      if (include_blind_review.length != 0) {
+        for (let rev of include_blind_review) {
+          let [comment_count] = await pool.execute(
+            `SELECT COUNT(*) AS count FROM review_comment WHERE review_id = ? `,
+            [rev.review_id]
+          );
+
+          if (comment_count[0].count != 0) {
+            rev.comment_count = comment_count[0].count;
+          } else {
+            rev.comment_count = 0;
+          }
+        }
+      } else {
+        include_blind_review = [];
+      }
+    }
+
     for (let rev of view_review) {
       let [comment_count] = await pool.execute(
         `SELECT COUNT(*) AS count FROM review_comment WHERE review_id = ? `,
@@ -449,8 +482,13 @@ router.post("/blind_review", async (req, res, next) => {
     if (blind_type == 0) {
       //리뷰 하나만 가리는 경우
       await pool.execute(
-        `INSERT INTO blind_review(blind_review_id, blind_user_id, user_id) VALUES(?, ?, ?)`,
-        [review_id, blind_user_info[0].user_id, user_id]
+        `INSERT INTO blind_review(blind_review_id, blind_user_id, user_id, character_id) VALUES(?, ?, ?, ?)`,
+        [
+          review_id,
+          blind_user_info[0].user_id,
+          user_id,
+          blind_user_info[0].character_id,
+        ]
       );
       result_code = 200;
       message = "해당 리뷰를 가렸습니다.";
@@ -469,8 +507,8 @@ router.post("/blind_review", async (req, res, next) => {
 
         if (blind[0] == undefined) {
           await pool.execute(
-            `INSERT INTO blind_review(blind_review_id, blind_user_id, user_id) VALUES(?, ?, ?)`,
-            [all.review_id, all.user_id, user_id]
+            `INSERT INTO blind_review(blind_review_id, blind_user_id, user_id, character_id) VALUES(?, ?, ?, ?)`,
+            [all.review_id, all.user_id, user_id, all.character_id]
           );
         }
       }
