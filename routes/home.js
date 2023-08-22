@@ -31,7 +31,7 @@ router.get("/anime", async (req, res, next) => {
     ); //같은 mbti의 주인공이 있는 애니
 
     let [same_mbti_char] = await pool.execute(
-      `SELECT * FROM anime_character WHERE character_mbti = ? LIMIT 10`,
+      `SELECT character_id, anime_contents.anime_id, character_img, character_name, character_mbti, title FROM anime_character JOIN anime_contents ON anime_character.anime_id = anime_contents.anime_id WHERE character_mbti = ? LIMIT 10`,
       [my_mbti[0].mbti]
     ); //같은 mbti인 캐릭터 모아보기
 
