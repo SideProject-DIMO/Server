@@ -291,7 +291,7 @@ router.get("/comment", async (req, res, next) => {
         `SELECT * FROM comment_like WHERE user_id = ? and comment_id = ?`,
         [user_id, comment.comment_id]
       );
-      if (is_liked[0] == null) comment.is_liked = "";
+      if (is_liked[0] == null) comment.is_liked = null;
       else comment.is_liked = is_liked[0];
     }
 
