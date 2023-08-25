@@ -96,7 +96,7 @@ router.get("/review_detail", async (req, res, next) => {
       `SELECT * FROM review_like WHERE review_id = ? and user_id = ?`,
       [review_id, user_id]
     );
-    if (is_liked[0] == null) is_liked = "";
+    if (is_liked[0] == null) is_liked = null;
 
     view_review[0].comment_count =
       comment_count[0] != null ? comment_count[0].count : 0;
