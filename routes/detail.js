@@ -90,9 +90,17 @@ router.get("/most_like", async (req, res, next) => {
       `SELECT mbti, COUNT(*) AS count FROM dimo_like JOIN user ON dimo_like.user_id = user.user_id WHERE content_id = ? GROUP BY mbti ORDER BY count DESC LIMIT 1`,
       [contentId]
     );
-
     result_code = 200;
     message = "가장 찜을 많이 누른 mbti를 조회했습니다.";
+    
+    if(most_mbti[0] == null){
+      return res.json({
+        code: result_code,
+        message: message,
+        user_id: user_id,
+        most_mbti: null,
+      });
+    }
 
     return res.json({
       code: result_code,

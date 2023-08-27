@@ -83,7 +83,7 @@ router.get("/review_detail", async (req, res, next) => {
       [review_id]
     );
     let [view_review] = await pool.execute(
-      `SELECT review_id, user.user_id, anime_character.character_id, review_content, review_like, review_hits, review_spoiler, nickname, mbti, profile_img, character_name, title, character_mbti FROM character_review JOIN user ON character_review.user_id = user.user_id JOIN anime_character ON character_review.character_id = anime_character.character_id JOIN anime_contents ON anime_character.anime_id = anime_contents.anime_id WHERE review_id = ?`,
+      `SELECT review_id, user.user_id, nickname, anime_character.character_id, review_content, review_like, review_hits, review_spoiler, nickname, mbti, profile_img, character_name, title, character_mbti FROM character_review JOIN user ON character_review.user_id = user.user_id JOIN anime_character ON character_review.character_id = anime_character.character_id JOIN anime_contents ON anime_character.anime_id = anime_contents.anime_id WHERE review_id = ?`,
       [review_id]
     );
 
