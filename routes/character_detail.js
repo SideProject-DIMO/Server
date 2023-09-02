@@ -282,7 +282,7 @@ router.get("/comment", async (req, res, next) => {
 
   try {
     let [view_comment] = await pool.execute(
-      `SELECT * FROM review_comment WHERE review_id = ?`,
+      `SELECT comment_id, review_id, user.user_id, nickname, comment_like, comment_content, comment_spoiler, character_id FROM review_comment JOIN user ON review_comment.user_id = user.user_id WHERE review_id = ?`,
       [review_id]
     );
 
@@ -296,7 +296,7 @@ router.get("/comment", async (req, res, next) => {
     }
 
     result_code = 200;
-    message = "리뷰를 조회했습니다.";
+    message = "댓글을 조회했습니다.";
     return res.json({
       code: result_code,
       message: message,
