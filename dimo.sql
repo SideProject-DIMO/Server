@@ -178,3 +178,11 @@ CREATE TABLE `blind_review` (
   `character_id` int(11) NOT NULL,
   PRIMARY KEY (`blind_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8mb4_general_ci;
+
+-- 최근 검색어 저장
+CREATE TABLE `sms_validation` (
+  `phone_number` varchar(15) NOT NULL,
+  `code` varchar(10) NOT NULL,
+  `expire` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`phone_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
