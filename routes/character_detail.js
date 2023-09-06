@@ -282,7 +282,7 @@ router.get("/comment", async (req, res, next) => {
 
   try {
     let [view_comment] = await pool.execute(
-      `SELECT comment_id, review_id, user.user_id, nickname, comment_like, comment_content, comment_spoiler, character_id FROM review_comment JOIN user ON review_comment.user_id = user.user_id WHERE review_id = ?`,
+      `SELECT comment_id, review_id, user.user_id, nickname, mbti, profile_img, comment_like, comment_content, comment_spoiler, character_id FROM review_comment JOIN user ON review_comment.user_id = user.user_id WHERE review_id = ?`,
       [review_id]
     );
 
