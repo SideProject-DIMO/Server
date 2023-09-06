@@ -111,10 +111,8 @@ CREATE TABLE `character_review` (
   `review_spoiler` int(11) DEFAULT '0',
   PRIMARY KEY (`review_id`),
   KEY `user_id` (`user_id`),
-  KEY `character_id` (`character_id`),
-  CONSTRAINT `character_review_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
-  CONSTRAINT `character_review_ibfk_2` FOREIGN KEY (`character_id`) REFERENCES `anime_character` (`character_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  KEY `character_id` (`character_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=91 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- 리뷰 댓글
 CREATE TABLE `review_comment` (
@@ -127,10 +125,8 @@ CREATE TABLE `review_comment` (
   `character_id` int(11) NOT NULL,
   PRIMARY KEY (`comment_id`),
   KEY `user_id` (`user_id`),
-  KEY `review_id` (`review_id`),
-  CONSTRAINT `review_comment_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
-  CONSTRAINT `review_comment_ibfk_2` FOREIGN KEY (`review_id`) REFERENCES `character_review` (`review_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  KEY `review_id` (`review_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- 리뷰 좋아요
 CREATE TABLE `review_like` (
