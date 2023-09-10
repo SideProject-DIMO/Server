@@ -13,7 +13,17 @@ router.post("/", async (req, res, next) => {
       `SELECT user_id FROM user WHERE user_id = ?`,
       [user_id]
     );
-    if (data[0] != undefined) {
+    if (data[0] != null) {
+      await pool.execute(`DELETE FROM blind_review WHERE user_id = ?`, [user_id]);
+      await pool.execute(`DELETE FROM character_review WHERE user_id = ?`, [user_id]);
+      await pool.execute(`DELETE FROM comment_like WHERE user_id = ?`, [user_id]);
+      await pool.execute(`DELETE FROM dimo_grade WHERE user_id = ?`, [user_id]);
+      await pool.execute(`DELETE FROM dimo_like WHERE user_id = ?`, [user_id]);
+      await pool.execute(`DELETE FROM report_user WHERE user_id = ?`, [user_id]);
+      await pool.execute(`DELETE FROM review_comment WHERE user_id = ?`, [user_id]);
+      await pool.execute(`DELETE FROM review_like WHERE user_id = ?`, [user_id]);
+      await pool.execute(`UPDATE anime_character_vote SET user_id = '알수없음' WHERE user_id = ?`, [user_id]);
+
       const [drop_user] = await pool.execute(
         `DELETE FROM user WHERE user_id = ?`,
         [user_id]

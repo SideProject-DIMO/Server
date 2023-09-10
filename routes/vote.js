@@ -4,7 +4,7 @@ const router = express.Router();
 
 router.post("/", async (req, res, next) => {
   //투표하기
-  const {user_id, contentId, character_id, ei, sn, tf, jp} = req.body;
+  const { user_id, contentId, character_id, ei, sn, tf, jp } = req.body;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
@@ -128,7 +128,7 @@ router.post("/", async (req, res, next) => {
 
 router.get("/", async (req, res, next) => {
   //투표 결과 조회하기
-  const {user_id, character_id} = req.query;
+  const { user_id, character_id } = req.query;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
@@ -262,7 +262,7 @@ router.get("/", async (req, res, next) => {
 
 router.get("/view_revote", async (req, res, next) => {
   //재투표 시, 기존 투표한 속성 조회
-  let {user_id, character_id} = req.query;
+  let { user_id, character_id } = req.query;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
 
@@ -289,7 +289,7 @@ router.get("/view_revote", async (req, res, next) => {
 
 router.post("/revote", async (req, res, next) => {
   //재투표하기
-  const {user_id, contentId, character_id, ei, sn, tf, jp} = req.body;
+  const { user_id, contentId, character_id, ei, sn, tf, jp } = req.body;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
@@ -382,7 +382,7 @@ router.post("/revote", async (req, res, next) => {
 });
 
 router.get("/recommend", async (req, res, next) => {
-  const {user_id, category} = req.query;
+  const { user_id, category } = req.query;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
   let random_sorted_arr;
@@ -457,7 +457,7 @@ router.get("/recommend", async (req, res, next) => {
 
 router.get("/search_character", async (req, res, next) => {
   //검색하기
-  let {user_id, search_content} = req.query;
+  let { user_id, search_content } = req.query;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
@@ -506,9 +506,149 @@ router.get("/search_character", async (req, res, next) => {
   }
 });
 
+
+router.get("/view_save_search", async (req, res, next) => {
+  //저장한 검색어 띄우기
+  let { user_id } = req.query;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+  try {
+    let search_list;
+    let [exist] = await pool.execute(
+      `SELECT * FROM search_list WHERE user_id = ?`,
+      [user_id]
+    );
+    if(exist[0] == null){
+      search_list = null;
+    }
+    else{
+      search_list = exist[0];
+    }
+
+    result_code = 200;
+    message = "최근 검색한 검색어를 조회했습니다.";
+    return res.json({
+      code: result_code,
+      message: message,
+      user_id: user_id,
+      search_list : search_list
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(error);
+  }
+});
+
+// const recentSearches = []; // 최근 검색어 저장
+
+router.post("/save_search", async (req, res, next) => {
+  //최근 검색어 저장하기
+  let { user_id, search_content } = req.body;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+  try {
+  //   // 새로운 검색어를 배열에 추가
+  // recentSearches.unshift(search_content);
+
+  // // 배열의 크기를 5로 유지
+  // if (recentSearches.length > 5) {
+  //   recentSearches.pop(); // 가장 오래된 검색어 제거
+  // }
+
+    let [exist] = await pool.execute(
+      `SELECT * FROM search_list WHERE user_id = ?`,
+      [user_id]
+    );
+
+    if (exist[0] == null) {
+      await pool.execute(`INSERT INTO search_list(user_id, search_content1) VALUES(?, ?)`, [
+        user_id,
+        search_content,
+      ]);
+    } else {
+      if (exist[0].search_content2 == null) {
+        await pool.execute(
+          `UPDATE search_list SET search_content2 = ? WHERE user_id = ? `,
+          [search_content, user_id]
+        );
+      } else if (exist[0].search_content3 == null) {
+        await pool.execute(
+          `UPDATE search_list SET search_content3 = ? WHERE user_id = ? `,
+          [
+            search_content,
+            user_id,
+          ]
+        );
+      } else if (exist[0].search_content4 == null) {
+        await pool.execute(
+          `UPDATE search_list SET search_content4 = ? WHERE user_id = ? `,
+          [
+            search_content,
+            user_id,
+          ]
+        );
+      } else if (exist[0].search_content5 == null) {
+        await pool.execute(
+          `UPDATE search_list SET search_content5 = ?, recent_search_num = ? WHERE user_id = ? `,
+          [
+            search_content,
+            1,
+            user_id,
+          ]
+        );
+      } else {
+        if (exist[0].recent_search_num == 1) {
+          await pool.execute(
+            `UPDATE search_list SET search_content1 = ?, recent_search_num = ? WHERE user_id = ? `,
+            [search_content, 2, user_id]
+          );
+        } else if (exist[0].recent_search_num == 2) {
+          await pool.execute(
+            `UPDATE search_list SET search_content2 = ?, recent_search_num = ? WHERE user_id = ? `,
+            [search_content, 3, user_id]
+          );
+        } else if (exist[0].recent_search_num == 3) {
+          await pool.execute(
+            `UPDATE search_list SET search_content3 = ?, recent_search_num = ? WHERE user_id = ? `,
+            [search_content, 4, user_id]
+          );
+        } else if (exist[0].recent_search_num == 4) {
+          await pool.execute(
+            `UPDATE search_list SET search_content4 = ?, recent_search_num = ? WHERE user_id = ? `,
+            [search_content, 5, user_id]
+          );
+        } else if (exist[0].recent_search_num == 5) {
+          await pool.execute(
+            `UPDATE search_list SET search_content5 = ?, recent_search_num = ? WHERE user_id = ? `,
+            [search_content, 1, user_id]
+          );
+        }
+      }
+    }
+
+    [exist] = await pool.execute(
+      `SELECT * FROM search_list WHERE user_id = ?`,
+      [user_id]
+    );
+
+
+    result_code = 200;
+    message = "최근 검색어를 저장했습니다.";
+    return res.json({
+      code: result_code,
+      message: message,
+      user_id: user_id,
+      search_list : exist[0]
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(error);
+  }
+});
+
 router.get("/search_content", async (req, res, next) => {
   //검색하기
-  let {user_id, search_content} = req.query;
+  let { user_id, search_content } = req.query;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
@@ -558,7 +698,7 @@ router.get("/search_content", async (req, res, next) => {
 
 router.get("/view_result", async (req, res, next) => {
   //캐릭터 분석 확인하기
-  let {user_id, character_id} = req.query;
+  let { user_id, character_id } = req.query;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
@@ -707,7 +847,7 @@ router.get("/view_result", async (req, res, next) => {
 
 router.get("/another_character", async (req, res, next) => {
   //같은 작품 속 다른 캐릭터 조회
-  let {user_id, character_id} = req.query;
+  let { user_id, character_id } = req.query;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
 
