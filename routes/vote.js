@@ -539,22 +539,12 @@ router.get("/view_save_search", async (req, res, next) => {
   }
 });
 
-// const recentSearches = []; // 최근 검색어 저장
-
 router.post("/save_search", async (req, res, next) => {
   //최근 검색어 저장하기
   let { user_id, search_content } = req.body;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
-  //   // 새로운 검색어를 배열에 추가
-  // recentSearches.unshift(search_content);
-
-  // // 배열의 크기를 5로 유지
-  // if (recentSearches.length > 5) {
-  //   recentSearches.pop(); // 가장 오래된 검색어 제거
-  // }
-
     let [exist] = await pool.execute(
       `SELECT * FROM search_list WHERE user_id = ?`,
       [user_id]
@@ -639,6 +629,56 @@ router.post("/save_search", async (req, res, next) => {
       message: message,
       user_id: user_id,
       search_list : exist[0]
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(error);
+  }
+});
+
+router.delete("/delete_search", async (req, res, next) => {
+  //최근 검색어 한 개 삭제하기
+  const {user_id, search_content} = req.query;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+  try {
+    await pool.execute(
+      `UPDATE search_list SET  WHERE user_id = ?`,
+      [user_id]
+    );
+    result_code = 200;
+    message = "리뷰를 삭제했습니다.";
+
+    return res.json({
+      code: result_code,
+      message: message,
+      user_id: user_id,
+      character_id: character_id,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(error);
+  }
+});
+
+router.delete("/delete_all_search", async (req, res, next) => {
+  //최근 검색어 전부 삭제하기
+  const {user_id} = req.body;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+  try {
+    await pool.execute(
+      `DELETE FROM search_list WHERE user_id = ?`,
+      [user_id]
+    );
+    
+    result_code = 200;
+    message = "최근 검색어를 모두 삭제했습니다.";
+
+    return res.json({
+      code: result_code,
+      message: message,
+      user_id: user_id,
     });
   } catch (err) {
     console.error(err);
