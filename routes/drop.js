@@ -14,24 +14,35 @@ router.post("/", async (req, res, next) => {
       [user_id]
     );
     if (data[0] != null) {
+      //투표 기록
+      //작품 평가하기(맘에 들어요/별로예요)기록
+      //찜하기 기록
+      //빼고 모두 다 삭제하시면 됩니다!
       await pool.execute(`DELETE FROM blind_review WHERE user_id = ?`, [user_id]);
+      let [character_review_id] = await pool.execute(`SELECT review_id FROM character_review WHERE user_id = ?`, [user_id]);
+      // console.log(character_review_id)
+      for(let char of character_review_id){
+        await pool.execute(`DELETE FROM review_comment WHERE review_id = ?`, [char.review_id]);
+      }
       await pool.execute(`DELETE FROM character_review WHERE user_id = ?`, [user_id]);
       await pool.execute(`DELETE FROM comment_like WHERE user_id = ?`, [user_id]);
-      await pool.execute(`DELETE FROM dimo_grade WHERE user_id = ?`, [user_id]);
-      await pool.execute(`DELETE FROM dimo_like WHERE user_id = ?`, [user_id]);
+      await pool.execute(`DELETE FROM review_like WHERE user_id = ?`, [user_id]);
       await pool.execute(`DELETE FROM report_user WHERE user_id = ?`, [user_id]);
       await pool.execute(`DELETE FROM review_comment WHERE user_id = ?`, [user_id]);
-      await pool.execute(`DELETE FROM review_like WHERE user_id = ?`, [user_id]);
+      await pool.execute(`UPDATE dimo_grade SET user_id = '알수없음' WHERE user_id = ?`, [user_id]);
+      await pool.execute(`UPDATE dimo_like SET user_id = '알수없음' WHERE user_id = ?`, [user_id]);
       await pool.execute(`UPDATE anime_character_vote SET user_id = '알수없음' WHERE user_id = ?`, [user_id]);
 
-      const [drop_user] = await pool.execute(
-        `DELETE FROM user WHERE user_id = ?`,
-        [user_id]
-      );
       const [reason] = await pool.execute(
-        `UPDATE drop_reason SET drop_reason = ?`,
+        `INSERT INTO drop_reason (drop_reason) VALUES(?)`,
         [drop_reason]
       );
+
+      const [drop_user] = await pool.execute(
+        `UPDATE user SET user_id=?, password=null, name='알수없음', agency=null, phone_number=null, refresh_token=null, intro=null, profile_img=null, nickname=? WHERE user_id = ?`,
+        ['알수없음'+reason.insertId, '알수없음'+reason.insertId, user_id]
+      );
+
       result_code = 200;
       message = "회원 탈퇴가 완료되었습니다.";
     } else {
