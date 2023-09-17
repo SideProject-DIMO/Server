@@ -216,13 +216,14 @@ router.delete("/delete_review", async (req, res, next) => {
   let message = "에러가 발생했습니다.";
   try {
     let [is_review_exist] = await pool.execute(
-      `SELECT * FROM review_like WHERE review_id = ?`,
+      `SELECT * FROM character_review WHERE review_id = ?`,
       [review_id]
     );
     if (is_review_exist[0] != null) {
       await pool.execute(`DELETE FROM review_like WHERE review_id = ?`, [
         review_id,
       ]);
+      await pool.execute(`DELETE FROM review_comment WHERE review_id = ?`, [review_id]);
     }
     await pool.execute(`DELETE FROM character_review WHERE review_id = ?`, [
       review_id,
