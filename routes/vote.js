@@ -2,6 +2,42 @@ const pool = require("../db");
 const express = require("express");
 const router = express.Router();
 
+router.post("/save_chr_list", async (req, res, next) => {
+  //최근 본 캐릭터 저장하기
+  let { user_id, character_id } = req.body;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+  try {
+    await pool.execute(`INSERT INTO recent_chr_list(user_id, character_id) VALUES(?, ?)`, [
+        user_id,
+        character_id
+      ]);
+
+    let [search_count] = await pool.execute(`SELECT COUNT(*) AS count FROM recent_chr_list WHERE user_id = ?`, [user_id]);
+    if (search_count[0].count >= 6) {
+        await pool.execute(
+          `DELETE recent_chr_list
+          FROM recent_chr_list
+          JOIN (
+              SELECT MIN(recent_chr_list_id) AS min_search_id
+              FROM recent_chr_list
+          ) AS min_search
+          ON recent_chr_list.recent_chr_list_id = min_search.min_search_id`);
+    } 
+
+    result_code = 200;
+    message = "최근 본 캐릭터를 저장했습니다.";
+    return res.json({
+      code: result_code,
+      message: message,
+      user_id: user_id,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(error);
+  }
+});
+
 router.post("/", async (req, res, next) => {
   //투표하기
   const { user_id, contentId, character_id, ei, sn, tf, jp } = req.body;
@@ -570,11 +606,6 @@ router.post("/save_search", async (req, res, next) => {
   let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
-    let [exist] = await pool.execute(
-      `SELECT * FROM search_list WHERE user_id = ?`,
-      [user_id]
-    );
-
     await pool.execute(`INSERT INTO search_list(user_id, content) VALUES(?, ?)`, [
         user_id,
         search_content
