@@ -544,7 +544,7 @@ router.get("/view_save_search", async (req, res, next) => {
       search_list = null;
     }
     else{
-      search_list = exist[0];
+      search_list = exist;
     }
 
     result_code = 200;
@@ -561,6 +561,9 @@ router.get("/view_save_search", async (req, res, next) => {
   }
 });
 
+// let recent_search_num = 1;
+// let delete_search_num = 1;
+
 router.post("/save_search", async (req, res, next) => {
   //최근 검색어 저장하기
   let { user_id, search_content } = req.body;
@@ -572,77 +575,27 @@ router.post("/save_search", async (req, res, next) => {
       [user_id]
     );
 
-    if (exist[0] == null) {
-      await pool.execute(`INSERT INTO search_list(user_id, search_content1) VALUES(?, ?)`, [
+    await pool.execute(`INSERT INTO search_list(user_id, content) VALUES(?, ?)`, [
         user_id,
-        search_content,
+        search_content
       ]);
-    } else {
-      if (exist[0].search_content2 == null) {
-        await pool.execute(
-          `UPDATE search_list SET search_content2 = ? WHERE user_id = ? `,
-          [search_content, user_id]
-        );
-      } else if (exist[0].search_content3 == null) {
-        await pool.execute(
-          `UPDATE search_list SET search_content3 = ? WHERE user_id = ? `,
-          [
-            search_content,
-            user_id,
-          ]
-        );
-      } else if (exist[0].search_content4 == null) {
-        await pool.execute(
-          `UPDATE search_list SET search_content4 = ? WHERE user_id = ? `,
-          [
-            search_content,
-            user_id,
-          ]
-        );
-      } else if (exist[0].search_content5 == null) {
-        await pool.execute(
-          `UPDATE search_list SET search_content5 = ?, recent_search_num = ? WHERE user_id = ? `,
-          [
-            search_content,
-            1,
-            user_id,
-          ]
-        );
-      } else {
-        if (exist[0].recent_search_num == 1) {
-          await pool.execute(
-            `UPDATE search_list SET search_content1 = ?, recent_search_num = ? WHERE user_id = ? `,
-            [search_content, 2, user_id]
-          );
-        } else if (exist[0].recent_search_num == 2) {
-          await pool.execute(
-            `UPDATE search_list SET search_content2 = ?, recent_search_num = ? WHERE user_id = ? `,
-            [search_content, 3, user_id]
-          );
-        } else if (exist[0].recent_search_num == 3) {
-          await pool.execute(
-            `UPDATE search_list SET search_content3 = ?, recent_search_num = ? WHERE user_id = ? `,
-            [search_content, 4, user_id]
-          );
-        } else if (exist[0].recent_search_num == 4) {
-          await pool.execute(
-            `UPDATE search_list SET search_content4 = ?, recent_search_num = ? WHERE user_id = ? `,
-            [search_content, 5, user_id]
-          );
-        } else if (exist[0].recent_search_num == 5) {
-          await pool.execute(
-            `UPDATE search_list SET search_content5 = ?, recent_search_num = ? WHERE user_id = ? `,
-            [search_content, 1, user_id]
-          );
-        }
-      }
-    }
 
+    let [search_count] = await pool.execute(`SELECT COUNT(*) AS count FROM search_list WHERE user_id = ?`, [user_id]);
+    if (search_count[0].count >= 6) {
+        await pool.execute(
+          `DELETE search_list
+          FROM search_list
+          JOIN (
+              SELECT MIN(search_id) AS min_search_id
+              FROM search_list
+          ) AS min_search
+          ON search_list.search_id = min_search.min_search_id`);
+    } 
+    
     [exist] = await pool.execute(
       `SELECT * FROM search_list WHERE user_id = ?`,
       [user_id]
     );
-
 
     result_code = 200;
     message = "최근 검색어를 저장했습니다.";
@@ -650,7 +603,7 @@ router.post("/save_search", async (req, res, next) => {
       code: result_code,
       message: message,
       user_id: user_id,
-      search_list : exist[0]
+      search_list : exist
     });
   } catch (err) {
     console.error(err);
@@ -660,22 +613,22 @@ router.post("/save_search", async (req, res, next) => {
 
 router.delete("/delete_search", async (req, res, next) => {
   //최근 검색어 한 개 삭제하기
-  const {user_id, search_content} = req.query;
+  const {user_id, search_content} = req.body;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
-    await pool.execute(
-      `UPDATE search_list SET  WHERE user_id = ?`,
-      [user_id]
-    );
+      await pool.execute(
+        `DELETE FROM search_list WHERE user_id = ? and content = ?`,
+        [user_id, search_content]
+      );
+
     result_code = 200;
-    message = "리뷰를 삭제했습니다.";
+    message = "최근 검색어 한 개를 삭제했습니다.";
 
     return res.json({
       code: result_code,
       message: message,
       user_id: user_id,
-      character_id: character_id,
     });
   } catch (err) {
     console.error(err);
