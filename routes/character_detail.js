@@ -10,7 +10,7 @@ router.get("/", async (req, res, next) => {
   try {
 
     [view_review] = await pool.execute(
-      `SELECT review_id, user.user_id, character_id, review_content, review_like, review_hits, review_spoiler, nickname, mbti, profile_img FROM character_review JOIN user ON character_review.user_id = user.user_id WHERE character_id = ? and user.user_id NOT IN (SELECT blind_user_id FROM blind_review WHERE user_id = ? and character_id = ?)`,
+      `SELECT review_id, user.user_id, character_id, review_content, review_like, review_hits, review_spoiler, nickname, mbti, profile_img FROM character_review JOIN user ON character_review.user_id = user.user_id WHERE character_id = ? and review_id NOT IN (SELECT blind_review_id FROM blind_review WHERE user_id = ? and character_id = ?)`,
       [character_id, user_id, character_id]
     );
 

@@ -179,11 +179,7 @@ CREATE TABLE `blind_review` (
 CREATE TABLE `search_list` (
   `search_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` varchar(30) NOT NULL,
-  `search_content1` varchar(30) DEFAULT NULL,
-  `search_content2` varchar(30) DEFAULT NULL,
-  `search_content3` varchar(30) DEFAULT NULL,
-  `search_content4` varchar(30) DEFAULT NULL,
-  `search_content5` varchar(30) DEFAULT NULL,
-  `recent_search_num` int(11) DEFAULT '0',
+  `content` varchar(30) NOT NULL,
+  `recent_search_num` int(11) NOT NULL,
   PRIMARY KEY (`search_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
