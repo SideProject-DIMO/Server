@@ -424,7 +424,29 @@ router.get("/recommend", async (req, res, next) => {
     } else {
       //인기순
       [pop_char] = await pool.execute(
-        `SELECT anime_character_vote.character_id, content_id, character_name, character_img, character_mbti, title, COUNT(*) AS count FROM anime_character_vote JOIN anime_character ON anime_character.character_id = anime_character_vote.character_id JOIN anime_contents ON anime_contents.anime_id = anime_character.anime_id GROUP BY anime_character_vote.character_id ORDER BY count DESC;`
+        `SELECT 
+        anime_character_vote.character_id, 
+        anime_contents.anime_id, 
+        anime_character.character_name, 
+        anime_character.character_img, 
+        anime_character.character_mbti, 
+        anime_contents.title, 
+        COUNT(*) AS count 
+    FROM 
+        anime_character_vote 
+    JOIN 
+        anime_character ON anime_character.character_id = anime_character_vote.character_id 
+    JOIN 
+        anime_contents ON anime_contents.anime_id = anime_character.anime_id 
+    GROUP BY 
+        anime_character_vote.character_id, 
+        anime_contents.anime_id, 
+        anime_character.character_name, 
+        anime_character.character_img, 
+        anime_character.character_mbti, 
+        anime_contents.title 
+    ORDER BY 
+        count DESC;`
       );
 
       for (let pop of pop_char) {
