@@ -597,9 +597,6 @@ router.get("/view_save_search", async (req, res, next) => {
   }
 });
 
-// let recent_search_num = 1;
-// let delete_search_num = 1;
-
 router.post("/save_search", async (req, res, next) => {
   //최근 검색어 저장하기
   let { user_id, search_content } = req.body;
@@ -685,6 +682,38 @@ router.delete("/delete_all_search", async (req, res, next) => {
       code: result_code,
       message: message,
       user_id: user_id,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(error);
+  }
+});
+
+router.get("/view_recent_seen_chr", async (req, res, next) => {
+  //최근 본 캐릭터 조회하기
+  let { user_id } = req.query;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+  try {
+    let seen_chr_list;
+    let [exist] = await pool.execute(
+      `SELECT * FROM recent_chr_list WHERE user_id = ?`,
+      [user_id]
+    );
+    if(exist[0] == null){
+      seen_chr_list = null;
+    }
+    else{
+      seen_chr_list = exist;
+    }
+
+    result_code = 200;
+    message = "최근 본 캐릭터를 조회했습니다.";
+    return res.json({
+      code: result_code,
+      message: message,
+      user_id: user_id,
+      seen_chr_list : seen_chr_list
     });
   } catch (err) {
     console.error(err);
