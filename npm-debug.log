@@ -1,0 +1,311 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/bin/node', '/usr/bin/npm', 'install' ]
+2 info using npm@3.5.2
+3 info using node@v8.10.0
+4 silly loadCurrentTree Starting
+5 silly install loadCurrentTree
+6 silly install readLocalPackageData
+7 silly install normalizeTree
+8 silly loadCurrentTree Finishing
+9 silly loadIdealTree Starting
+10 silly install loadIdealTree
+11 silly cloneCurrentTree Starting
+12 silly install cloneCurrentTreeToIdealTree
+13 silly cloneCurrentTree Finishing
+14 silly loadShrinkwrap Starting
+15 silly install loadShrinkwrap
+16 silly loadShrinkwrap Finishing
+17 silly loadAllDepsIntoIdealTree Starting
+18 silly install loadAllDepsIntoIdealTree
+19 silly fetchNamedPackageData axios
+20 silly mapToRegistry name axios
+21 silly mapToRegistry using default registry
+22 silly mapToRegistry registry https://registry.npmjs.org/
+23 silly mapToRegistry uri https://registry.npmjs.org/axios
+24 silly fetchNamedPackageData bcrypt
+25 silly mapToRegistry name bcrypt
+26 silly mapToRegistry using default registry
+27 silly mapToRegistry registry https://registry.npmjs.org/
+28 silly mapToRegistry uri https://registry.npmjs.org/bcrypt
+29 silly fetchNamedPackageData body-parser
+30 silly mapToRegistry name body-parser
+31 silly mapToRegistry using default registry
+32 silly mapToRegistry registry https://registry.npmjs.org/
+33 silly mapToRegistry uri https://registry.npmjs.org/body-parser
+34 silly fetchNamedPackageData crypto-js
+35 silly mapToRegistry name crypto-js
+36 silly mapToRegistry using default registry
+37 silly mapToRegistry registry https://registry.npmjs.org/
+38 silly mapToRegistry uri https://registry.npmjs.org/crypto-js
+39 silly fetchNamedPackageData dotenv
+40 silly mapToRegistry name dotenv
+41 silly mapToRegistry using default registry
+42 silly mapToRegistry registry https://registry.npmjs.org/
+43 silly mapToRegistry uri https://registry.npmjs.org/dotenv
+44 silly fetchNamedPackageData express
+45 silly mapToRegistry name express
+46 silly mapToRegistry using default registry
+47 silly mapToRegistry registry https://registry.npmjs.org/
+48 silly mapToRegistry uri https://registry.npmjs.org/express
+49 silly fetchNamedPackageData jsonwebtoken
+50 silly mapToRegistry name jsonwebtoken
+51 silly mapToRegistry using default registry
+52 silly mapToRegistry registry https://registry.npmjs.org/
+53 silly mapToRegistry uri https://registry.npmjs.org/jsonwebtoken
+54 silly fetchNamedPackageData mysql2
+55 silly mapToRegistry name mysql2
+56 silly mapToRegistry using default registry
+57 silly mapToRegistry registry https://registry.npmjs.org/
+58 silly mapToRegistry uri https://registry.npmjs.org/mysql2
+59 silly fetchNamedPackageData puppeteer
+60 silly mapToRegistry name puppeteer
+61 silly mapToRegistry using default registry
+62 silly mapToRegistry registry https://registry.npmjs.org/
+63 silly mapToRegistry uri https://registry.npmjs.org/puppeteer
+64 verbose request uri https://registry.npmjs.org/axios
+65 verbose request no auth needed
+66 info attempt registry request try #1 at 4:59:59 PM
+67 verbose request id fbac524a9f0b9cde
+68 http request GET https://registry.npmjs.org/axios
+69 verbose request uri https://registry.npmjs.org/bcrypt
+70 verbose request no auth needed
+71 info attempt registry request try #1 at 4:59:59 PM
+72 http request GET https://registry.npmjs.org/bcrypt
+73 verbose request uri https://registry.npmjs.org/body-parser
+74 verbose request no auth needed
+75 info attempt registry request try #1 at 4:59:59 PM
+76 http request GET https://registry.npmjs.org/body-parser
+77 verbose request uri https://registry.npmjs.org/crypto-js
+78 verbose request no auth needed
+79 info attempt registry request try #1 at 4:59:59 PM
+80 http request GET https://registry.npmjs.org/crypto-js
+81 verbose request uri https://registry.npmjs.org/dotenv
+82 verbose request no auth needed
+83 info attempt registry request try #1 at 4:59:59 PM
+84 http request GET https://registry.npmjs.org/dotenv
+85 verbose request uri https://registry.npmjs.org/express
+86 verbose request no auth needed
+87 info attempt registry request try #1 at 4:59:59 PM
+88 http request GET https://registry.npmjs.org/express
+89 verbose request uri https://registry.npmjs.org/jsonwebtoken
+90 verbose request no auth needed
+91 info attempt registry request try #1 at 4:59:59 PM
+92 http request GET https://registry.npmjs.org/jsonwebtoken
+93 verbose request uri https://registry.npmjs.org/mysql2
+94 verbose request no auth needed
+95 info attempt registry request try #1 at 4:59:59 PM
+96 http request GET https://registry.npmjs.org/mysql2
+97 verbose request uri https://registry.npmjs.org/puppeteer
+98 verbose request no auth needed
+99 info attempt registry request try #1 at 4:59:59 PM
+100 http request GET https://registry.npmjs.org/puppeteer
+101 http 200 https://registry.npmjs.org/body-parser
+102 verbose headers { date: 'Mon, 19 Jun 2023 07:59:59 GMT',
+102 verbose headers   'content-type': 'application/json',
+102 verbose headers   'transfer-encoding': 'chunked',
+102 verbose headers   connection: 'keep-alive',
+102 verbose headers   'cf-ray': '7d9a3c5fcdbbed89-ICN',
+102 verbose headers   'cf-cache-status': 'HIT',
+102 verbose headers   'access-control-allow-origin': '*',
+102 verbose headers   age: '4',
+102 verbose headers   'cache-control': 'public, max-age=300',
+102 verbose headers   etag: 'W/"f1277901b1fe242b7b3ed8859c9ce05b"',
+102 verbose headers   'last-modified': 'Fri, 09 Jun 2023 21:32:57 GMT',
+102 verbose headers   vary: 'accept-encoding, accept',
+102 verbose headers   'x-amz-replication-status': 'COMPLETED',
+102 verbose headers   'x-amz-server-side-encryption': 'AES256',
+102 verbose headers   server: 'cloudflare',
+102 verbose headers   'content-encoding': 'gzip' }
+103 silly get cb [ 200,
+103 silly get   { date: 'Mon, 19 Jun 2023 07:59:59 GMT',
+103 silly get     'content-type': 'application/json',
+103 silly get     'transfer-encoding': 'chunked',
+103 silly get     connection: 'keep-alive',
+103 silly get     'cf-ray': '7d9a3c5fcdbbed89-ICN',
+103 silly get     'cf-cache-status': 'HIT',
+103 silly get     'access-control-allow-origin': '*',
+103 silly get     age: '4',
+103 silly get     'cache-control': 'public, max-age=300',
+103 silly get     etag: 'W/"f1277901b1fe242b7b3ed8859c9ce05b"',
+103 silly get     'last-modified': 'Fri, 09 Jun 2023 21:32:57 GMT',
+103 silly get     vary: 'accept-encoding, accept',
+103 silly get     'x-amz-replication-status': 'COMPLETED',
+103 silly get     'x-amz-server-side-encryption': 'AES256',
+103 silly get     server: 'cloudflare',
+103 silly get     'content-encoding': 'gzip' } ]
+104 verbose get saving body-parser to /root/.npm/registry.npmjs.org/body-parser/.cache.json
+105 silly resolveWithNewModule body-parser@1.20.2 checking installable status
+106 silly cache add args [ 'body-parser@^1.20.2', null ]
+107 verbose cache add spec body-parser@^1.20.2
+108 silly cache add parsed spec Result {
+108 silly cache add   raw: 'body-parser@^1.20.2',
+108 silly cache add   scope: null,
+108 silly cache add   name: 'body-parser',
+108 silly cache add   rawSpec: '^1.20.2',
+108 silly cache add   spec: '>=1.20.2 <2.0.0',
+108 silly cache add   type: 'range' }
+109 silly addNamed body-parser@>=1.20.2 <2.0.0
+110 verbose addNamed ">=1.20.2 <2.0.0" is a valid semver range for body-parser
+111 silly addNameRange { name: 'body-parser', range: '>=1.20.2 <2.0.0', hasData: false }
+112 silly mapToRegistry name body-parser
+113 silly mapToRegistry using default registry
+114 silly mapToRegistry registry https://registry.npmjs.org/
+115 silly mapToRegistry uri https://registry.npmjs.org/body-parser
+116 verbose addNameRange registry:https://registry.npmjs.org/body-parser not in flight; fetching
+117 verbose get https://registry.npmjs.org/body-parser not expired, no request
+118 silly addNameRange number 2 { name: 'body-parser', range: '>=1.20.2 <2.0.0', hasData: true }
+119 silly addNameRange versions [ 'body-parser',
+119 silly addNameRange   [ '1.0.0',
+119 silly addNameRange     '1.0.1',
+119 silly addNameRange     '1.0.2',
+119 silly addNameRange     '1.1.0',
+119 silly addNameRange     '1.1.1',
+119 silly addNameRange     '1.1.2',
+119 silly addNameRange     '1.2.0',
+119 silly addNameRange     '1.2.1',
+119 silly addNameRange     '1.2.2',
+119 silly addNameRange     '1.3.0',
+119 silly addNameRange     '1.3.1',
+119 silly addNameRange     '1.4.0',
+119 silly addNameRange     '1.4.1',
+119 silly addNameRange     '1.4.2',
+119 silly addNameRange     '1.4.3',
+119 silly addNameRange     '1.5.0',
+119 silly addNameRange     '1.5.1',
+119 silly addNameRange     '1.5.2',
+119 silly addNameRange     '1.6.0',
+119 silly addNameRange     '1.6.1',
+119 silly addNameRange     '1.6.2',
+119 silly addNameRange     '1.6.3',
+119 silly addNameRange     '1.6.4',
+119 silly addNameRange     '1.6.5',
+119 silly addNameRange     '1.6.6',
+119 silly addNameRange     '1.6.7',
+119 silly addNameRange     '1.7.0',
+119 silly addNameRange     '1.8.0',
+119 silly addNameRange     '1.8.1',
+119 silly addNameRange     '1.8.2',
+119 silly addNameRange     '1.8.3',
+119 silly addNameRange     '1.8.4',
+119 silly addNameRange     '1.9.0',
+119 silly addNameRange     '1.9.1',
+119 silly addNameRange     '1.9.2',
+119 silly addNameRange     '1.9.3',
+119 silly addNameRange     '1.10.0',
+119 silly addNameRange     '1.10.1',
+119 silly addNameRange     '1.10.2',
+119 silly addNameRange     '1.11.0',
+119 silly addNameRange     '1.12.0',
+119 silly addNameRange     '1.12.1',
+119 silly addNameRange     '1.12.2',
+119 silly addNameRange     '1.12.3',
+119 silly addNameRange     '1.12.4',
+119 silly addNameRange     '1.13.0',
+119 silly addNameRange     '1.13.1',
+119 silly addNameRange     '1.13.2',
+119 silly addNameRange     '1.13.3',
+119 silly addNameRange     '1.14.0',
+119 silly addNameRange     '1.14.1',
+119 silly addNameRange     '1.14.2',
+119 silly addNameRange     '1.15.0',
+119 silly addNameRange     '1.15.1',
+119 silly addNameRange     '1.15.2',
+119 silly addNameRange     '1.16.0',
+119 silly addNameRange     '1.16.1',
+119 silly addNameRange     '1.17.0',
+119 silly addNameRange     '1.17.1',
+119 silly addNameRange     '1.17.2',
+119 silly addNameRange     '1.18.0',
+119 silly addNameRange     '1.18.1',
+119 silly addNameRange     '1.18.2',
+119 silly addNameRange     '1.18.3',
+119 silly addNameRange     '1.19.0',
+119 silly addNameRange     '1.19.1',
+119 silly addNameRange     '2.0.0-beta.1',
+119 silly addNameRange     '1.19.2',
+119 silly addNameRange     '1.20.0',
+119 silly addNameRange     '1.20.1',
+119 silly addNameRange     '1.20.2',
+119 silly addNameRange     '2.0.0-beta.2' ] ]
+120 silly addNamed body-parser@1.20.2
+121 verbose addNamed "1.20.2" is a plain semver version for body-parser
+122 silly mapToRegistry name body-parser
+123 silly mapToRegistry using default registry
+124 silly mapToRegistry registry https://registry.npmjs.org/
+125 silly mapToRegistry uri https://registry.npmjs.org/body-parser
+126 verbose addRemoteTarball https://registry.npmjs.org/body-parser/-/body-parser-1.20.2.tgz not in flight; adding
+127 verbose addRemoteTarball [ 'https://registry.npmjs.org/body-parser/-/body-parser-1.20.2.tgz',
+127 verbose addRemoteTarball   '6feb0e21c4724d06de7ff38da36dad4f57a747fd' ]
+128 info retry fetch attempt 1 at 5:00:00 PM
+129 info attempt registry request try #1 at 5:00:00 PM
+130 http fetch GET https://registry.npmjs.org/body-parser/-/body-parser-1.20.2.tgz
+131 http 200 https://registry.npmjs.org/axios
+132 verbose headers { date: 'Mon, 19 Jun 2023 07:59:59 GMT',
+132 verbose headers   'content-type': 'application/json',
+132 verbose headers   'transfer-encoding': 'chunked',
+132 verbose headers   connection: 'keep-alive',
+132 verbose headers   'cf-ray': '7d9a3c5fddb39329-ICN',
+132 verbose headers   'cf-cache-status': 'HIT',
+132 verbose headers   'access-control-allow-origin': '*',
+132 verbose headers   age: '276',
+132 verbose headers   'cache-control': 'public, max-age=300',
+132 verbose headers   etag: 'W/"4c213063d008776346bfb5a4c9a8fa63"',
+132 verbose headers   'last-modified': 'Sat, 20 May 2023 13:42:02 GMT',
+132 verbose headers   vary: 'accept-encoding, accept',
+132 verbose headers   'x-amz-replication-status': 'COMPLETED',
+132 verbose headers   'x-amz-server-side-encryption': 'AES256',
+132 verbose headers   server: 'cloudflare',
+132 verbose headers   'content-encoding': 'gzip' }
+133 silly get cb [ 200,
+133 silly get   { date: 'Mon, 19 Jun 2023 07:59:59 GMT',
+133 silly get     'content-type': 'application/json',
+133 silly get     'transfer-encoding': 'chunked',
+133 silly get     connection: 'keep-alive',
+133 silly get     'cf-ray': '7d9a3c5fddb39329-ICN',
+133 silly get     'cf-cache-status': 'HIT',
+133 silly get     'access-control-allow-origin': '*',
+133 silly get     age: '276',
+133 silly get     'cache-control': 'public, max-age=300',
+133 silly get     etag: 'W/"4c213063d008776346bfb5a4c9a8fa63"',
+133 silly get     'last-modified': 'Sat, 20 May 2023 13:42:02 GMT',
+133 silly get     vary: 'accept-encoding, accept',
+133 silly get     'x-amz-replication-status': 'COMPLETED',
+133 silly get     'x-amz-server-side-encryption': 'AES256',
+133 silly get     server: 'cloudflare',
+133 silly get     'content-encoding': 'gzip' } ]
+134 verbose get saving axios to /root/.npm/registry.npmjs.org/axios/.cache.json
+135 http fetch 200 https://registry.npmjs.org/body-parser/-/body-parser-1.20.2.tgz
+136 silly fetchAndShaCheck shasum 6feb0e21c4724d06de7ff38da36dad4f57a747fd
+137 verbose addTmpTarball /tmp/npm-8725-1cbd318d/registry.npmjs.org/body-parser/-/body-parser-1.20.2.tgz not in flight; adding
+138 verbose addTmpTarball already have metadata; skipping unpack for body-parser@1.20.2
+139 verbose stack Error: Missing required argument #1
+139 verbose stack     at andLogAndFinish (/usr/share/npm/lib/fetch-package-metadata.js:31:3)
+139 verbose stack     at fetchPackageMetadata (/usr/share/npm/lib/fetch-package-metadata.js:51:22)
+139 verbose stack     at resolveWithNewModule (/usr/share/npm/lib/install/deps.js:456:12)
+139 verbose stack     at /usr/share/npm/lib/install/deps.js:457:7
+139 verbose stack     at /usr/share/npm/node_modules/iferr/index.js:13:50
+139 verbose stack     at /usr/share/npm/lib/fetch-package-metadata.js:37:12
+139 verbose stack     at addRequestedAndFinish (/usr/share/npm/lib/fetch-package-metadata.js:82:5)
+139 verbose stack     at returnAndAddMetadata (/usr/share/npm/lib/fetch-package-metadata.js:117:7)
+139 verbose stack     at pickVersionFromRegistryDocument (/usr/share/npm/lib/fetch-package-metadata.js:134:20)
+139 verbose stack     at /usr/share/npm/node_modules/iferr/index.js:13:50
+140 verbose cwd /root/Server
+141 error Linux 4.15.0-118-generic
+142 error argv "/usr/bin/node" "/usr/bin/npm" "install"
+143 error node v8.10.0
+144 error npm  v3.5.2
+145 error code EMISSINGARG
+146 error typeerror Error: Missing required argument #1
+146 error typeerror     at andLogAndFinish (/usr/share/npm/lib/fetch-package-metadata.js:31:3)
+146 error typeerror     at fetchPackageMetadata (/usr/share/npm/lib/fetch-package-metadata.js:51:22)
+146 error typeerror     at resolveWithNewModule (/usr/share/npm/lib/install/deps.js:456:12)
+146 error typeerror     at /usr/share/npm/lib/install/deps.js:457:7
+146 error typeerror     at /usr/share/npm/node_modules/iferr/index.js:13:50
+146 error typeerror     at /usr/share/npm/lib/fetch-package-metadata.js:37:12
+146 error typeerror     at addRequestedAndFinish (/usr/share/npm/lib/fetch-package-metadata.js:82:5)
+146 error typeerror     at returnAndAddMetadata (/usr/share/npm/lib/fetch-package-metadata.js:117:7)
+146 error typeerror     at pickVersionFromRegistryDocument (/usr/share/npm/lib/fetch-package-metadata.js:134:20)
+146 error typeerror     at /usr/share/npm/node_modules/iferr/index.js:13:50
+147 error typeerror This is an error with npm itself. Please report this error at:
+147 error typeerror     <http://github.com/npm/npm/issues>
+148 verbose exit [ 1, true ]
