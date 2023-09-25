@@ -180,6 +180,13 @@ CREATE TABLE `search_list` (
   `search_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` varchar(30) NOT NULL,
   `content` varchar(30) NOT NULL,
-  `recent_search_num` int(11) NOT NULL,
   PRIMARY KEY (`search_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- 최근 본 캐릭터 저장
+CREATE TABLE `recent_chr_list` (
+  `recent_chr_list_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(30) NOT NULL,
+  `character_id` varchar(30) NOT NULL,
+  PRIMARY KEY (`recent_chr_list_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
