@@ -514,7 +514,7 @@ router.get("/recommend", async (req, res, next) => {
 });
 
 router.get("/search_character", async (req, res, next) => {
-  //검색하기
+  //캐릭터 검색하기
   let { user_id, search_content } = req.query;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
@@ -722,7 +722,7 @@ router.get("/view_recent_seen_chr", async (req, res, next) => {
 });
 
 router.get("/search_content", async (req, res, next) => {
-  //검색하기
+  //내용 검색하기
   let { user_id, search_content } = req.query;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
