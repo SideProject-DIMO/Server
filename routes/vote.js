@@ -514,7 +514,7 @@ router.get("/recommend", async (req, res, next) => {
 });
 
 router.get("/search_character", async (req, res, next) => {
-  //검색하기
+  //캐릭터 검색하기
   let { user_id, search_content } = req.query;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
@@ -721,8 +721,58 @@ router.get("/view_recent_seen_chr", async (req, res, next) => {
   }
 });
 
+router.delete("/delete_seen_chr", async (req, res, next) => {
+  //최근 본 캐릭터 한 개 삭제하기
+  const {user_id, character_id} = req.body;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+  try {
+      await pool.execute(
+        `DELETE FROM recent_chr_list WHERE user_id = ? and character_id = ?`,
+        [user_id, character_id]
+      );
+
+    result_code = 200;
+    message = "최근 본 캐릭터 한 개를 삭제했습니다.";
+
+    return res.json({
+      code: result_code,
+      message: message,
+      user_id: user_id,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(error);
+  }
+});
+
+router.delete("/delete_all_seen_chr", async (req, res, next) => {
+  //최근 본 캐릭터 전부 삭제하기
+  const {user_id} = req.body;
+  let result_code = 404;
+  let message = "에러가 발생했습니다.";
+  try {
+    await pool.execute(
+      `DELETE FROM recent_chr_list WHERE user_id = ?`,
+      [user_id]
+    );
+    
+    result_code = 200;
+    message = "최근 본 캐릭터를 모두 삭제했습니다.";
+
+    return res.json({
+      code: result_code,
+      message: message,
+      user_id: user_id,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json(error);
+  }
+});
+
 router.get("/search_content", async (req, res, next) => {
-  //검색하기
+  //내용 검색하기
   let { user_id, search_content } = req.query;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
