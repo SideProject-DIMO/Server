@@ -3,10 +3,23 @@ const express = require("express");
 const multer = require("multer");
 const path = require("path");
 const router = express.Router();
+const admin = require('firebase-admin');
+const database = require("../routes/firebase/config");
+const fs = require('fs');
+
+const storage = multer.diskStorage({
+  // destination: (req, file, cb) => {
+  //   cb(null, 'uploads/'); // 이미지가 서버에 업로드될 디렉토리
+  // },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + '-' + file.originalname); // 파일명 설정
+  },
+});
+const upload = multer({ storage: storage });
 
 // 내 프로필 조회하기
 router.get("/", async (req, res, next) => {
-  const {user_id} = req.query;
+  const { user_id } = req.query;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
 
@@ -34,29 +47,68 @@ router.get("/", async (req, res, next) => {
 });
 
 // 내 프로필 수정하기
-router.post("/mod_profile", async (req, res, next) => {
-  //upload.single("file"),
-  const {user_id, profile_img, intro} = req.body;
+router.post("/mod_profile", upload.single("image"), async (req, res, next) => {
+  const { user_id, intro } = req.body;
+  console.log(intro);
+  const imageFile = req.file;
   let result_code = 404;
   let message = "에러가 발생했습니다";
   try {
     //프로필 이미지 수정x
-    if (profile_img == null) {
+    if (imageFile == null && intro != null) {
       await pool.execute(`UPDATE user SET intro = ? WHERE user_id = ?`, [
         intro,
         user_id,
       ]);
-    } else if (intro == null) {
+    } else if (intro == null && imageFile != null) {
       //인트로 수정x
+      const bucket = admin.storage().bucket();
+      const destination = "profile/" + imageFile.originalname;
+      const file = bucket.file(destination);
+      const stream = file.createWriteStream({
+        metadata: {
+          contentType: imageFile.mimetype,
+        },
+      });
+
+      stream.on("error", (error) => {
+        console.error(error);
+        res.status(500).send("Upload failed");
+      });
+
+      stream.on("finish", () => {
+        res.status(200).send("Image uploaded successfully");
+      });
+
+      fs.createReadStream(imageFile.path).pipe(stream);
+
       await pool.execute(`UPDATE user SET profile_img = ? WHERE user_id = ?`, [
-        profile_img,
+        destination,
         user_id,
       ]);
+
     } else {
       //둘 다 수정
+      const bucket = admin.storage().bucket();
+      const destination = "profile/" + imageFile.originalname;
+      const file = bucket.file(destination);
+
+      const stream = file.createWriteStream({
+        metadata: {
+          contentType: imageFile.mimetype,
+        },
+      });
+
+      stream.on("error", (error) => {
+        console.error(error);
+        // res.status(500).send("Upload failed");
+      });
+
+      fs.createReadStream(imageFile.path).pipe(stream);
+
       await pool.execute(
         `UPDATE user SET profile_img = ?, intro = ? WHERE user_id = ?`,
-        [profile_img, intro, user_id]
+        [destination, intro, user_id]
       );
     }
 
@@ -75,7 +127,7 @@ router.post("/mod_profile", async (req, res, next) => {
 
 // 좋아요 누른 애니메이션 조회하기
 router.get("/like_anime_content", async (req, res, next) => {
-  const {user_id} = req.query;
+  const { user_id } = req.query;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
 
@@ -106,7 +158,7 @@ router.get("/like_anime_content", async (req, res, next) => {
 
 // 좋아요 누른 영화 조회하기
 router.get("/like_movie_content", async (req, res, next) => {
-  const {user_id} = req.query;
+  const { user_id } = req.query;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
@@ -135,7 +187,7 @@ router.get("/like_movie_content", async (req, res, next) => {
 
 //내가 쓴 댓글 조회하기
 router.get("/comment", async (req, res, next) => {
-  const {user_id} = req.query;
+  const { user_id } = req.query;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
@@ -164,7 +216,7 @@ router.get("/comment", async (req, res, next) => {
 
 //내가 쓴 리뷰 조회하기
 router.get("/review", async (req, res, next) => {
-  const {user_id} = req.query;
+  const { user_id } = req.query;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
@@ -193,7 +245,7 @@ router.get("/review", async (req, res, next) => {
 
 //투표 완료한 캐릭터 조회
 router.get("/voted_character", async (req, res, next) => {
-  const {user_id} = req.query;
+  const { user_id } = req.query;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
