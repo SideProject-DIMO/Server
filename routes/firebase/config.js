@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 const firebase = require("firebase-admin");
 const fbanalytics = require("firebase/analytics");
-const serviceAccount = require("../../dimo-79e0d-firebase-adminsdk-nwk8l-77890cb879.json");
+const serviceAccount = require("../../firebase-adminsdk.json");
 require("dotenv").config();
 
 // TODO: Add SDKs for Firebase products that you want to use

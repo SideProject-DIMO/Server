@@ -49,7 +49,6 @@ router.get("/", async (req, res, next) => {
 // 내 프로필 수정하기
 router.post("/mod_profile", upload.single("image"), async (req, res, next) => {
   const { user_id, intro } = req.body;
-  console.log(intro);
   const imageFile = req.file;
   let result_code = 404;
   let message = "에러가 발생했습니다";
@@ -73,11 +72,6 @@ router.post("/mod_profile", upload.single("image"), async (req, res, next) => {
 
       stream.on("error", (error) => {
         console.error(error);
-        res.status(500).send("Upload failed");
-      });
-
-      stream.on("finish", () => {
-        res.status(200).send("Image uploaded successfully");
       });
 
       fs.createReadStream(imageFile.path).pipe(stream);
@@ -101,7 +95,6 @@ router.post("/mod_profile", upload.single("image"), async (req, res, next) => {
 
       stream.on("error", (error) => {
         console.error(error);
-        // res.status(500).send("Upload failed");
       });
 
       fs.createReadStream(imageFile.path).pipe(stream);
