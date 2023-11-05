@@ -8,6 +8,17 @@ router.post("/save_chr_list", async (req, res, next) => {
   let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
+    let exist = await pool.execute(`SELECT * FROM recent_chr_list WHERE user_id = ? and character_id = ?`, [user_id, character_id]);
+    if(exist[0] != ""){
+      result_code = 201;
+      message = "이미 찾아본 캐릭터입니다.";
+      return res.json({
+        code: result_code,
+        message: message,
+        user_id: user_id,
+      });
+    }
+
     await pool.execute(`INSERT INTO recent_chr_list(user_id, character_id) VALUES(?, ?)`, [
         user_id,
         character_id
@@ -603,6 +614,18 @@ router.post("/save_search", async (req, res, next) => {
   let result_code = 404;
   let message = "에러가 발생했습니다.";
   try {
+    let exist = await pool.execute(`SELECT * FROM search_list WHERE user_id = ? and content = ?`, [user_id, search_content]);
+
+    if(exist[0] != ""){
+      result_code = 201;
+      message = "이미 찾아본 검색어입니다.";
+      return res.json({
+        code: result_code,
+        message: message,
+        user_id: user_id,
+      });
+    }
+
     await pool.execute(`INSERT INTO search_list(user_id, content) VALUES(?, ?)`, [
         user_id,
         search_content
