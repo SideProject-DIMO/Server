@@ -17,7 +17,7 @@ router.post("/", async (req, res, next) => {
       //투표 기록
       //작품 평가하기(맘에 들어요/별로예요)기록
       //찜하기 기록
-      //빼고 모두 다 삭제하시면 됩니다!
+      //빼고 모두 다 삭제
       await pool.execute(`DELETE FROM blind_review WHERE user_id = ?`, [user_id]);
       let [character_review_id] = await pool.execute(`SELECT review_id FROM character_review WHERE user_id = ?`, [user_id]);
       // console.log(character_review_id)

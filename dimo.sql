@@ -9,7 +9,7 @@ CREATE TABLE `user` (
   `phone_number` varchar(15) DEFAULT NULL,
   `nickname` varchar(10) DEFAULT NULL,
   `mbti` varchar(5) DEFAULT NULL,
-  `refresh_token` varchar(200) DEFAULT NULL,
+  `refresh_token` varchar(300) DEFAULT NULL,
   `updated_at_nickname` timestamp NULL DEFAULT NULL,
   `updated_at_mbti` timestamp NULL DEFAULT NULL,
   `intro` varchar(100) DEFAULT NULL,
