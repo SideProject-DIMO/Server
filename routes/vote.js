@@ -728,9 +728,16 @@ router.get("/view_recent_seen_chr", async (req, res, next) => {
     }
     else{
       let [char_info] = await pool.execute(
-        `SELECT recent_chr_list_id, user_id, recent_chr_list.character_id, character_img, character_name, title FROM anime_character JOIN anime_contents ON anime_character.anime_id = anime_contents.anime_id JOIN recent_chr_list ON anime_character.character_id = recent_chr_list.character_id WHERE user_id = ?`,
+        `SELECT anime_contents.anime_id, recent_chr_list_id, user_id, recent_chr_list.character_id, character_img, character_name, title FROM anime_character JOIN anime_contents ON anime_character.anime_id = anime_contents.anime_id JOIN recent_chr_list ON anime_character.character_id = recent_chr_list.character_id WHERE user_id = ?`,
         [user_id]
-      )
+      );
+      for (let i of char_info){
+        let [is_voted] = await pool.execute(
+          `SELECT * FROM anime_character_vote WHERE user_id = ? and character_id = ?`, [user_id, i.character_id]
+        );
+        if(is_voted[0] == null) i.is_voted = 0;
+        else i.is_voted = 1;
+      }
       seen_chr_list = char_info;
     }
 
