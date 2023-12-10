@@ -6,8 +6,9 @@ const router = express.Router();
 const admin = require('firebase-admin');
 const database = require("../routes/firebase/config");
 const fs = require('fs');
+const { getStorage, getInstance, ref, deleteObject } = require('firebase-admin/storage');
 
-const storage = multer.diskStorage({
+const disk_storage = multer.diskStorage({
   // destination: (req, file, cb) => {
   //   cb(null, 'uploads/'); // 이미지가 서버에 업로드될 디렉토리
   // },
@@ -15,7 +16,7 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + '-' + file.originalname); // 파일명 설정
   },
 });
-const upload = multer({ storage: storage });
+const upload = multer({ storage: disk_storage });
 
 // 내 프로필 조회하기
 router.get("/", async (req, res, next) => {
@@ -53,6 +54,9 @@ router.post("/mod_profile", upload.single("image"), async (req, res, next) => {
   let result_code = 404;
   let message = "에러가 발생했습니다";
   try {
+    let [is_exist] = await pool.execute(
+      `SELECT profile_img, intro FROM user WHERE user_id = ?`, [user_id]);
+
     //프로필 이미지 수정x
     if (imageFile == null && intro != null) {
       await pool.execute(`UPDATE user SET intro = ? WHERE user_id = ?`, [
@@ -62,7 +66,7 @@ router.post("/mod_profile", upload.single("image"), async (req, res, next) => {
     } else if (intro == null && imageFile != null) {
       //인트로 수정x
       const bucket = admin.storage().bucket();
-      const destination = "profile/" + imageFile.originalname;
+      const destination = "profile/" + user_id + "_" + imageFile.originalname;
       const file = bucket.file(destination);
       const stream = file.createWriteStream({
         metadata: {
@@ -75,6 +79,11 @@ router.post("/mod_profile", upload.single("image"), async (req, res, next) => {
       });
 
       fs.createReadStream(imageFile.path).pipe(stream);
+      if(is_exist[0].profile_img != null){
+        const desertRef = bucket.file(is_exist[0].profile_img && is_exist[0].profile_img != '');
+        // Delete the file
+        desertRef.delete();
+      }
 
       await pool.execute(`UPDATE user SET profile_img = ? WHERE user_id = ?`, [
         destination,
@@ -84,7 +93,7 @@ router.post("/mod_profile", upload.single("image"), async (req, res, next) => {
     } else {
       //둘 다 수정
       const bucket = admin.storage().bucket();
-      const destination = "profile/" + imageFile.originalname;
+      const destination = "profile/" + user_id + "_" + imageFile.originalname;
       const file = bucket.file(destination);
 
       const stream = file.createWriteStream({
@@ -98,6 +107,12 @@ router.post("/mod_profile", upload.single("image"), async (req, res, next) => {
       });
 
       fs.createReadStream(imageFile.path).pipe(stream);
+
+      if(is_exist[0].profile_img != null && is_exist[0].profile_img != ''){
+        const desertRef = bucket.file(is_exist[0].profile_img);
+        // Delete the file
+        desertRef.delete();
+      }
 
       await pool.execute(
         `UPDATE user SET profile_img = ?, intro = ? WHERE user_id = ?`,
