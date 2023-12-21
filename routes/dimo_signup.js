@@ -71,30 +71,6 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-// sms 인증
-// function makeSignature(time) {
-//   var space = " "; // one space
-//   var newLine = "\n"; // new line
-//   var method = "POST"; // method
-//   var url = `/sms/v2/services/${process.env.naver_id}/messages`; // url (include query string)
-//   var timestamp = time; // current timestamp (epoch)
-//   var accessKey = process.env.naver_access; // access key id (from portal or Sub Account)
-//   var secretKey = process.env.naver_console_secret; // secret key (from portal or Sub Account)
-
-//   var hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, secretKey);
-//   hmac.update(method);
-//   hmac.update(space);
-//   hmac.update(url);
-//   hmac.update(newLine);
-//   hmac.update(timestamp);
-//   hmac.update(newLine);
-//   hmac.update(accessKey);
-
-//   var hash = hmac.finalize();
-
-//   return hash.toString(CryptoJS.enc.Base64);
-// }
-
 router.post("/phone-check", async (req, res) => {
   const body = req.body;
   const phone_number = body.phone_number;
