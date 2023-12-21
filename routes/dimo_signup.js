@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const axios = require("axios");
 const jwt = require("jsonwebtoken");
 const CryptoJS = require("crypto-js");
+const msgModule = require('coolsms-node-sdk').default
 
 //회원가입
 router.post("/", async (req, res, next) => {
@@ -97,37 +98,20 @@ router.post("/", async (req, res, next) => {
 router.post("/phone-check", async (req, res) => {
   const body = req.body;
   const phone_number = body.phone_number;
-  console.log(body);
 
-  const sms_url = `https://sens.apigw.ntruss.com/sms/v2/services/${process.env.naver_id}/messages`;
-  const time_stamp = Date.now().toString();
-  // const signature = makeSignature(time_stamp);
   let code = "";
   for (let i = 0; i < 6; i++) code += Math.floor(Math.random() * 10);
   try {
-    // const sms_res = await axios.post(
-    //   sms_url,
-    //   {
-    //     type: "SMS",
-    //     from: "번호",
-    //     countryCode: "82",
-    //     content: `Dimo 인증번호는 [${code}]입니다.`,
-    //     messages: [
-    //       {
-    //         to: phone_number,
-    //         content: `Dimo 인증번호는 [${code}]입니다.`,
-    //       },
-    //     ],
-    //   },
-    //   {
-    //     headers: {
-    //       "Content-Type": "application/json; charset=utf-8",
-    //       "x-ncp-apigw-timestamp": time_stamp,
-    //       "x-ncp-iam-access-key": process.env.naver_access,
-    //       "x-ncp-apigw-signature-v2": signature,
-    //     },
-    //   }
-    // );
+    // 인증을 위해 발급받은 본인의 API Key를 사용합니다.
+    const messageService = new msgModule(process.env.sms_api_key, process.env.sms_api_secret);
+
+    const params = {
+      text: `Dimo 인증번호는 ${code}입니다.`, // 문자 내용
+      to: `${phone_number}`, // 수신번호 (받는이)
+      from: '01036205872' // 발신번호 (보내는이)
+    }
+    messageService.sendMany([params]).then(console.log).catch(console.error)
+  
     const [result] = await pool.execute(
       `INSERT INTO sms_validation(phone_number, code, expire) VALUES (?, ?, NOW() + INTERVAL 3 MINUTE) ON DUPLICATE KEY UPDATE code = ?, expire = NOW() + INTERVAL 3 MINUTE`,
       [phone_number, code, code]
