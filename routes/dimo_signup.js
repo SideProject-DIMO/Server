@@ -82,7 +82,7 @@ router.post("/phone-check", async (req, res) => {
     const messageService = new msgModule(process.env.sms_api_key, process.env.sms_api_secret);
 
     const params = {
-      text: `Dimo 인증번호는 ${code}입니다.`, // 문자 내용
+      text: `DIMO 인증번호는 ${code}입니다.`, // 문자 내용
       to: `${phone_number}`, // 수신번호 (받는이)
       from: '01036205872' // 발신번호 (보내는이)
     }
