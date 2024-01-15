@@ -1409,7 +1409,7 @@ CREATE TABLE `user` (
   `user_no` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` varchar(100) NOT NULL,
   `password` varchar(100) DEFAULT NULL,
-  `name` varchar(10) NOT NULL,
+  `name` varchar(20) NOT NULL,
   `sns_type` varchar(10) DEFAULT NULL,
   `agency` varchar(6) DEFAULT NULL,
   `phone_number` varchar(15) DEFAULT NULL,
