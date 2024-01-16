@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
 const CryptoJS = require("crypto-js");
+const msgModule = require('coolsms-node-sdk').default
 
 require("dotenv").config();
 
@@ -199,37 +200,10 @@ router.get("/find_id", async (req, res, next) => {
   }
 });
 
-// sms 인증
-// function makeSignature(time) {
-//   var space = " "; // one space
-//   var newLine = "\n"; // new line
-//   var method = "POST"; // method
-//   var url = `/sms/v2/services/${process.env.naver_id}/messages`; // url (include query string)
-//   var timestamp = time; // current timestamp (epoch)
-//   var accessKey = process.env.naver_access; // access key id (from portal or Sub Account)
-//   var secretKey = process.env.naver_console_secret; // secret key (from portal or Sub Account)
-
-//   var hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA256, secretKey);
-//   hmac.update(method);
-//   hmac.update(space);
-//   hmac.update(url);
-//   hmac.update(newLine);
-//   hmac.update(timestamp);
-//   hmac.update(newLine);
-//   hmac.update(accessKey);
-
-//   var hash = hmac.finalize();
-
-//   return hash.toString(CryptoJS.enc.Base64);
-// }
-
 router.post("/find_pw", async (req, res, next) => {
   let {user_id, phone_number} = req.body;
   let result_code = 404;
   let message = "에러가 발생했습니다.";
-  const sms_url = `https://sens.apigw.ntruss.com/sms/v2/services/${process.env.naver_id}/messages`;
-  const time_stamp = Date.now().toString();
-  // const signature = makeSignature(time_stamp);
   let code = "";
   for (let i = 0; i < 6; i++) code += Math.floor(Math.random() * 10);
 
@@ -243,29 +217,15 @@ router.post("/find_pw", async (req, res, next) => {
       result_code = 400;
       message = "존재하지 않는 사용자 정보입니다.";
     } else {
-      // const sms_res = await axios.post(
-      //   sms_url,
-      //   {
-      //     type: "SMS",
-      //     from: "번호",
-      //     countryCode: "82",
-      //     content: `임시 비밀번호는 [${code}]입니다.`,
-      //     messages: [
-      //       {
-      //         to: phone_number,
-      //         content: `임시 비밀번호는 [${code}]입니다.`,
-      //       },
-      //     ],
-      //   },
-      //   {
-      //     headers: {
-      //       "Content-Type": "application/json; charset=utf-8",
-      //       "x-ncp-apigw-timestamp": time_stamp,
-      //       "x-ncp-iam-access-key": process.env.naver_access,
-      //       "x-ncp-apigw-signature-v2": signature,
-      //     },
-      //   }
-      // );
+      // 인증을 위해 발급받은 API Key를 사용합니다.
+      const messageService = new msgModule(process.env.sms_api_key, process.env.sms_api_secret);
+
+      const params = {
+        text: `DIMO의 일회용 비밀번호는 ${code}입니다.`, // 문자 내용
+        to: `${phone_number}`, // 수신번호 (받는이)
+        from: '01036205872' // 발신번호 (보내는이)
+      }
+      messageService.sendMany([params]).then(console.log).catch(console.error)
       const password_bcrypt = bcrypt.hashSync(code, 10); // sync
       await pool.execute(`UPDATE user SET password = ? WHERE user_id = ?`, [
         password_bcrypt,
@@ -278,7 +238,6 @@ router.post("/find_pw", async (req, res, next) => {
       code: result_code,
       message: message,
       user_id: user_id,
-      new_pw: code,
     });
   } catch (err) {
     console.error(err);
