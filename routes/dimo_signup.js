@@ -78,7 +78,7 @@ router.post("/phone-check", async (req, res) => {
   let code = "";
   for (let i = 0; i < 6; i++) code += Math.floor(Math.random() * 10);
   try {
-    // 인증을 위해 발급받은 본인의 API Key를 사용합니다.
+    // 인증을 위해 발급받은 API Key를 사용합니다.
     const messageService = new msgModule(process.env.sms_api_key, process.env.sms_api_secret);
 
     const params = {
