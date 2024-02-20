@@ -71,6 +71,8 @@ router.post("/google_login", async (req, res, next) => {
       user_id,
     ]);
 
+    console.log(data[0]);
+
     //계정이 없다면
     access_token = await jwt.sign(
       {
