@@ -37,9 +37,31 @@ router.get("/check", async (req, res, next) => {
   let result_code = 404;
   let message = "에러가 발생했습니다";
 
+  // try {
+  //   let [check_user_id] = await pool.execute(
+  //     `SELECT user_id FROM user WHERE user_id = ? and sns_type = ?`,
+  //     [user_id, sns_type]
+  //   );
+  //   if (check_user_id[0] == undefined) {
+  //     result_code = 201;
+  //     message = "가입된 사용자가 아닙니다.";
+  //   } else {
+  //     result_code = 200;
+  //     message = "가입된 사용자입니다.";
+  //   }
+  //   return res.json({
+  //     code: result_code,
+  //     message: message,
+  //     user_id: user_id,
+  //   });
+  // } catch (err) {
+  //   console.error(err);
+  //   return res.status(500).json(err);
+  // }
+
   try {
     let [check_user_id] = await pool.execute(
-      `SELECT user_id FROM user WHERE user_id = ? and sns_type = ?`,
+      `SELECT nickname, mbti FROM user WHERE user_id = ? and sns_type = ?`,
       [user_id, sns_type]
     );
     if (check_user_id[0] == undefined) {
