@@ -119,7 +119,7 @@ router.post("/google_login", async (req, res, next) => {
       );
       resultCode = 200;
       message = data[0].name + "님 환영합니다!";
-      
+
       console.log("Google Login Success!");
     }
     return res.json({
@@ -184,6 +184,8 @@ router.post("/kakao_login", async (req, res, next) => {
       );
       resultCode = 200;
       message = "카카오 계정 회원가입 성공!";
+      console.log("Kakao Signup Success!");
+
     } else {
       //로그인
       let [data2] = await pool.execute(
@@ -192,6 +194,9 @@ router.post("/kakao_login", async (req, res, next) => {
       );
       resultCode = 200;
       message = data[0].name + "님 환영합니다!";
+
+      console.log("Kakao Login Success!");
+
     }
     res.json({
       code: resultCode,
