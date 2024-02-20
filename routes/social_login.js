@@ -109,6 +109,8 @@ router.post("/google_login", async (req, res, next) => {
       );
       resultCode = 200;
       message = "구글 계정 회원가입 성공!";
+
+      console.log("Google Signup Success!");
     } else {
       //로그인
       let [data2] = await pool.execute(
@@ -117,6 +119,8 @@ router.post("/google_login", async (req, res, next) => {
       );
       resultCode = 200;
       message = data[0].name + "님 환영합니다!";
+      
+      console.log("Google Login Success!");
     }
     return res.json({
       code: resultCode,
