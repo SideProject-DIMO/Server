@@ -20,7 +20,7 @@ router.post("/", async (req, res, next) => {
       //빼고 모두 다 삭제
       await pool.execute(`DELETE FROM blind_review WHERE user_id = ?`, [user_id]);
       let [character_review_id] = await pool.execute(`SELECT review_id FROM character_review WHERE user_id = ?`, [user_id]);
-      // console.log(character_review_id)
+      console.log(user_id+" 탈퇴");
       for(let char of character_review_id){
         await pool.execute(`DELETE FROM review_comment WHERE review_id = ?`, [char.review_id]);
       }
