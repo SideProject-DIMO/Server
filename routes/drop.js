@@ -42,6 +42,8 @@ router.post("/", async (req, res, next) => {
         `UPDATE user SET user_id=?, password=null, name='알수없음', agency=null, phone_number=null, refresh_token=null, intro=null, profile_img=null, nickname=? WHERE user_id = ?`,
         ['알수없음'+reason.insertId, '알수없음'+reason.insertId, user_id]
       );
+    
+      console.log(reason.insertId);
 
       result_code = 200;
       message = "회원 탈퇴가 완료되었습니다.";
