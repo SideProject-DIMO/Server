@@ -61,10 +61,13 @@ router.get("/check", async (req, res, next) => {
 
   try {
     let [check_user_id] = await pool.execute(
-      `SELECT nickname, mbti FROM user WHERE user_id = ? and sns_type = ?`,
+      `SELECT nickname FROM user WHERE user_id = ? and sns_type = ?`,
       [user_id, sns_type]
     );
-    if (check_user_id[0] == undefined) {
+    console.log(check_user_id[0].nickname);
+    console.log(check_user_id[0]);
+
+    if (check_user_id[0].nickname == null) {
       result_code = 201;
       message = "가입된 사용자가 아닙니다.";
     } else {
