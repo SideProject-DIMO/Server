@@ -65,7 +65,6 @@ router.get("/check", async (req, res, next) => {
       [user_id, sns_type]
     );
     console.log(check_user_id[0].nickname);
-    console.log(check_user_id[0]);
 
     if (check_user_id[0].nickname == null) {
       result_code = 201;
