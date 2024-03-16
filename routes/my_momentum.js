@@ -200,7 +200,7 @@ router.get("/comment", async (req, res, next) => {
   let message = "에러가 발생했습니다.";
   try {
     const [my_comment] = await pool.execute(
-      `SELECT title, review_comment.comment_id, review_comment.review_id, review_comment.user_id, comment_like, comment_content, comment_spoiler, anime_character.character_id, anime_character.anime_id, anime_character.character_img, anime_character.character_name, anime_character.character_mbti FROM review_comment JOIN anime_character ON review_comment.character_id = anime_character.character_id JOIN anime_contents ON anime_contents.anime_id = anime_character.anime_id WHERE user_id = ?`,
+      `SELECT title, review_comment.comment_id, review_comment.review_id, review_comment.user_id, comment_like, comment_content, comment_spoiler, anime_character.character_id, anime_character.anime_id, anime_character.character_img, anime_character.character_name, anime_character.character_mbti FROM review_comment JOIN anime_character ON review_comment.character_id = anime_character.character_id JOIN anime_contents ON anime_contents.anime_id = anime_character.anime_id WHERE user_id = ? ORDER BY review_comment.comment_id DESC`,
       [user_id]
     );
     if (my_comment[0] == null) {
