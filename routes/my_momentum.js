@@ -141,7 +141,7 @@ router.get("/like_anime_content", async (req, res, next) => {
 
   try {
     const [my_like_content] = await pool.execute(
-      `SELECT anime_id, poster_img FROM anime_contents WHERE anime_id in (SELECT content_id FROM dimo_like WHERE user_id = ?)`,
+      `SELECT anime_id, poster_img, title FROM anime_contents WHERE anime_id in (SELECT content_id FROM dimo_like WHERE user_id = ?)`,
       [user_id]
     );
     console.log(my_like_content);
