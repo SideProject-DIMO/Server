@@ -10,7 +10,7 @@ router.get("/", async (req, res, next) => {
   try {
 
     [view_review] = await pool.execute(
-      `SELECT review_id, user.user_id, character_id, review_content, review_like, review_hits, review_spoiler, nickname, mbti, profile_img FROM character_review JOIN user ON character_review.user_id = user.user_id WHERE character_id = ? and review_id NOT IN (SELECT blind_review_id FROM blind_review WHERE user_id = ? and character_id = ?)`,
+      `SELECT review_id, user.user_id, character_id, review_content, review_like, review_hits, review_spoiler, nickname, mbti, profile_img FROM character_review JOIN user ON character_review.user_id = user.user_id WHERE character_id = ? and review_id NOT IN (SELECT blind_review_id FROM blind_review WHERE user_id = ? and character_id = ?) ORDER BY review_id DESC`,
       [character_id, user_id, character_id]
     );
 
@@ -252,7 +252,7 @@ router.get("/comment", async (req, res, next) => {
 
   try {
     let [view_comment] = await pool.execute(
-      `SELECT comment_id, review_id, user.user_id, nickname, mbti, profile_img, comment_like, comment_content, comment_spoiler, character_id FROM review_comment JOIN user ON review_comment.user_id = user.user_id WHERE review_id = ?`,
+      `SELECT comment_id, review_id, user.user_id, nickname, mbti, profile_img, comment_like, comment_content, comment_spoiler, character_id FROM review_comment JOIN user ON review_comment.user_id = user.user_id WHERE review_id = ? ORDER BY comment_id DESC`,
       [review_id]
     );
 
