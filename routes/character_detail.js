@@ -137,6 +137,10 @@ router.post("/review_like", async (req, res, next) => {
       result_code = 201;
       message = "이미 좋아요를 누른 리뷰입니다.";
     }
+    let [like_cnt] = await pool.execute(
+      `SELECT review_like FROM character_review where review_id = ?`,
+      [review_id]
+    );
 
     return res.json({
       code: result_code,
@@ -144,6 +148,7 @@ router.post("/review_like", async (req, res, next) => {
       user_id: user_id,
       character_id: character_id,
       review_id: review_id,
+      like_cnt: like_cnt.review_like,
     });
   } catch (err) {
     console.error(err);
@@ -168,12 +173,18 @@ router.post("/review_dislike", async (req, res, next) => {
     result_code = 200;
     message = "좋아요를 취소했습니다.";
 
+    let [like_cnt] = await pool.execute(
+      `SELECT review_like FROM character_review where review_id = ?`,
+      [review_id]
+    );
+
     return res.json({
       code: result_code,
       message: message,
       user_id: user_id,
       character_id: character_id,
       review_id: review_id,
+      like_cnt: like_cnt.review_like,
     });
   } catch (err) {
     console.error(err);
