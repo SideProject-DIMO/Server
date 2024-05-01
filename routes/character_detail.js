@@ -148,7 +148,7 @@ router.post("/review_like", async (req, res, next) => {
       user_id: user_id,
       character_id: character_id,
       review_id: review_id,
-      like_cnt: like_cnt.review_like,
+      like_cnt: like_cnt[0].review_like,
     });
   } catch (err) {
     console.error(err);
@@ -184,7 +184,7 @@ router.post("/review_dislike", async (req, res, next) => {
       user_id: user_id,
       character_id: character_id,
       review_id: review_id,
-      like_cnt: like_cnt.review_like,
+      like_cnt: like_cnt[0].review_like,
     });
   } catch (err) {
     console.error(err);
